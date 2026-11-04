@@ -1,0 +1,32 @@
+{
+  "mobile-madrid": {
+    "p50": "16.70",
+    "p95": "16.70",
+    "text": "60 fps · p50 16.7 · p95 16.7 ms\n3764/4633 arcos · 22.483 puntos · U=100\npresupuesto 30.000 · dpr 2 · z 7.8"
+  },
+  "mobile-espana": {
+    "p50": "16.70",
+    "p95": "16.80",
+    "text": "60 fps · p50 16.7 · p95 16.8 ms\n346/1000 arcos · 17.423 puntos · U=10\npresupuesto 30.000 · dpr 2 · z 4.3"
+  },
+  "mobile-nochebuena": {
+    "p50": "16.70",
+    "p95": "16.80",
+    "text": "60 fps · p50 16.7 · p95 16.8 ms\n3734/4625 arcos · 19.922 puntos · U=100\npresupuesto 30.000 · dpr 2 · z 7.8"
+  },
+  "desktop-madrid": {
+    "p50": "16.70",
+    "p95": "16.70",
+    "text": "60 fps · p50 16.7 · p95 16.7 ms\n4459/4633 arcos · 27.539 puntos · U=200\npresupuesto 30.000 · dpr 1 · z 8.9"
+  },
+  "desktop-espana": {
+    "p50": "16.70",
+    "p95": "16.70",
+    "text": "60 fps · p50 16.7 · p95 16.7 ms\n652/1000 arcos · 22.076 puntos · U=20\npresupuesto 30.000 · dpr 1 · z 5.2"
+  },
+  "desktop-nochebuena": {
+    "p50": "16.70",
+    "p95": "16.80",
+    "text": "60 fps · p50 16.7 · p95 16.8 ms\n4445/4625 arcos · 23.959 puntos · U=200\npresupuesto 30.000 · dpr 1 · z 8.9"
+  }
+}

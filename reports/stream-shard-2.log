@@ -1,0 +1,36 @@
+- The project is out-of-sync -- use `renv::status()` for details.
+Warning messages:
+1: package ‘DBI’ was built under R version 4.5.2 
+2: package ‘duckdb’ was built under R version 4.5.2 
+shard 2/3: 24 days, 23 to do
+duckdb keeps downloaded extensions and secrets in a temporary directory:
+/var/folders/fx/wfhn8whx1xv627hz1jd91m_c0000gn/T//RtmpwxGaQ6/duckdb
+This is removed when the R session ends.
+Extensions are re-downloaded each session.
+Secrets are lost.
+Run duckdb(shared_home = TRUE) (or create ~/.duckdb) to keep them (suitable for most users).
+Run duckdb(shared_home = FALSE) to accept the temporary directory (and silence this message).
+See ?duckdb_storage for details and alternatives.
+2024-07-13  14.3M rows  20.8 s
+2024-07-17  15.2M rows  31.0 s
+2024-07-21  13.1M rows  30.6 s
+2024-07-25  14.8M rows  24.3 s
+2024-07-30  14.9M rows  32.2 s
+2024-08-02  15.4M rows  27.4 s
+2024-08-06  14.9M rows  36.9 s
+2024-08-10  13.7M rows  21.2 s
+2024-08-14  14.7M rows  27.6 s
+2024-08-22  14.8M rows  23.5 s
+2024-10-01  14.3M rows  24.9 s
+2024-10-05  14.0M rows  23.3 s
+2024-10-09  13.7M rows  32.2 s
+2024-10-20  12.3M rows  21.7 s
+2024-10-24  14.2M rows  25.6 s
+2024-12-24  12.3M rows  27.7 s
+2025-02-02  11.8M rows  23.0 s
+2025-02-06  13.4M rows  27.9 s
+2025-02-11  13.8M rows  26.4 s
+2025-02-15  13.3M rows  24.0 s
+2025-02-19  13.8M rows  25.9 s
+2025-02-23  12.2M rows  24.9 s
+2025-02-27  14.5M rows  24.0 s

@@ -1,0 +1,525 @@
+{
+  "retrieved_at": "2026-11-04T09:18:16+0100",
+  "bucket": "https://movilidad-opendata.mitma.es",
+  "licence": "Licencia de datos abiertos del MITMA (2020-12-03). Atribución: «Basado en datos abiertos MITMA».",
+  "files": [
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios.shp",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios.shp",
+      "bytes": 21421124,
+      "sha256": "3ed711e3cb6d74c13400f469c810e431fbc7d8b1462654226a2a297d879aca58",
+      "last_modified": "Wed, 19 Apr 2023 09:57:10 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios.shx",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios.shx",
+      "bytes": 21980,
+      "sha256": "2a926e8758b103f97c8143409beb49484f9d57f11507bba68ccf313770c5f060",
+      "last_modified": "Wed, 19 Apr 2023 09:57:12 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios.dbf",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios.dbf",
+      "bytes": 221601,
+      "sha256": "90fc2bf119176b045cb32acc484cd861d4dc7dae9c4611436bcdb34decd56087",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios.prj",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios.prj",
+      "bytes": 393,
+      "sha256": "45bb4e50d6458324cd89be2b9de22dcda8a1e2ac57c97513deba0b812918cc7c",
+      "last_modified": "Wed, 19 Apr 2023 09:57:10 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios.cpg",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.shp",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.shp",
+      "bytes": 76680,
+      "sha256": "b19cc4eca1fbbb6b9cfb0758a65a14a9cec22a6b3dd583db0504ad710c39919b",
+      "last_modified": "Wed, 19 Apr 2023 09:57:13 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.shx",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.shx",
+      "bytes": 21980,
+      "sha256": "e47ae735d0f2073db1c6261682c2c70d1c89474d3302eae0a15229763b371cbe",
+      "last_modified": "Wed, 19 Apr 2023 09:57:13 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.dbf",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.dbf",
+      "bytes": 221601,
+      "sha256": "90fc2bf119176b045cb32acc484cd861d4dc7dae9c4611436bcdb34decd56087",
+      "last_modified": "Wed, 19 Apr 2023 09:57:12 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.prj",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.prj",
+      "bytes": 393,
+      "sha256": "45bb4e50d6458324cd89be2b9de22dcda8a1e2ac57c97513deba0b812918cc7c",
+      "last_modified": "Wed, 19 Apr 2023 09:57:13 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.cpg",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/zonificacion_municipios_centroides.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+      "last_modified": "Wed, 19 Apr 2023 09:57:12 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/nombres_municipios.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/nombres_municipios.csv",
+      "bytes": 91538,
+      "sha256": "a69bdf634190380a346635afaebba90215a774ae0dfe0d62538f774f46a0cfbd",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_municipios/poblacion_municipios.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_municipios/poblacion_municipios.csv",
+      "bytes": 40360,
+      "sha256": "85afd2666ca499882ce3a91cbc3c4642b121a211db1c1f4f4ad6defd809e3313",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus.shp",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus.shp",
+      "bytes": 20057808,
+      "sha256": "f3416ee5baa4f85caf8cef676006f68ee7939b4b6ddc0a1265100c8c4f20381c",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus.shx",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus.shx",
+      "bytes": 17724,
+      "sha256": "33882c5effe5dfcf63ef32eab37de43e0b7980634ee545e05517803b08b8f78d",
+      "last_modified": "Wed, 19 Apr 2023 09:57:08 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus.dbf",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus.dbf",
+      "bytes": 178509,
+      "sha256": "28ae66d69d66a5d2c37b43982b80aa5e9695cfa70f99dca5c46ada95a22a4c0f",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus.prj",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus.prj",
+      "bytes": 393,
+      "sha256": "45bb4e50d6458324cd89be2b9de22dcda8a1e2ac57c97513deba0b812918cc7c",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus.cpg",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.shp",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.shp",
+      "bytes": 61784,
+      "sha256": "86bfba70996b85b7ff7ece3889a4280390c8aa346cf32e8ca376f1c0bcb533e3",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.shx",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.shx",
+      "bytes": 17724,
+      "sha256": "5395f39958c6b24aef50c284c0b74c98c6e4ed3e8de0473e20ab76993d81b046",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.dbf",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.dbf",
+      "bytes": 178509,
+      "sha256": "28ae66d69d66a5d2c37b43982b80aa5e9695cfa70f99dca5c46ada95a22a4c0f",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.prj",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.prj",
+      "bytes": 393,
+      "sha256": "45bb4e50d6458324cd89be2b9de22dcda8a1e2ac57c97513deba0b812918cc7c",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.cpg",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/zonificacion_gaus_centroides.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824",
+      "last_modified": "Wed, 19 Apr 2023 09:57:09 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/nombres_gaus.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/nombres_gaus.csv",
+      "bytes": 68993,
+      "sha256": "daeab9b163dfad363832908caaf51044815d4614d83c63d939fe935d64b86c08",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/zonificacion_GAU/poblacion_gaus.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/zonificacion_GAU/poblacion_gaus.csv",
+      "bytes": 33393,
+      "sha256": "f938c50fe00665c652651a45119f1a4dbabf6feaee19e2d38318e8b4b344ea2d",
+      "last_modified": "Wed, 19 Apr 2023 09:57:06 GMT"
+    },
+    {
+      "key": "zonificacion/relacion_ine_zonificacionMitma.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/relacion_ine_zonificacionMitma.csv",
+      "bytes": 1919214,
+      "sha256": "7c95e27e6ef4d314749423928173451eefd8fdc618996ca40e1f90a776ce46b9",
+      "last_modified": "Wed, 19 Apr 2023 09:57:13 GMT"
+    },
+    {
+      "key": "zonificacion/poblacion.csv",
+      "url": "https://movilidad-opendata.mitma.es/zonificacion/poblacion.csv",
+      "bytes": 97707,
+      "sha256": "aa20b471f94f52d6aecc4ea1bf53683f9bfb13e01d52ab76048d986b67468e5b",
+      "last_modified": "Wed, 19 Apr 2023 09:57:13 GMT"
+    },
+    {
+      "key": "LICENCIA de datos abiertos del MITMA 20201203.pdf",
+      "url": "https://movilidad-opendata.mitma.es/LICENCIA%20de%20datos%20abiertos%20del%20MITMA%2020201203.pdf",
+      "bytes": 161992,
+      "sha256": "73ab661c78c25d6d191bb785e808cd40f70240e67bb96946f90be086cab1a92e",
+      "last_modified": "Mon, 19 Dec 2022 13:32:07 GMT"
+    },
+    {
+      "key": "LEEME_Especificaciones_indicadores_OpenDataMovilidad.xlsx",
+      "url": "https://movilidad-opendata.mitma.es/LEEME_Especificaciones_indicadores_OpenDataMovilidad.xlsx",
+      "bytes": 140348,
+      "sha256": "37861a6bb1f960c824f5b8035824ffc9979d494a7773f28b5abda62028bb8762",
+      "last_modified": "Thu, 04 Dec 2025 08:21:57 GMT"
+    },
+    {
+      "key": "LEEME_CambioMetodología_IndicadoresBigdata_posteriores_a_20250701.pdf",
+      "url": "https://movilidad-opendata.mitma.es/LEEME_CambioMetodolog%C3%ADa_IndicadoresBigdata_posteriores_a_20250701.pdf",
+      "bytes": 165024,
+      "sha256": "fe21e1a7ac95175e4c73189dde84fb58b6bb6bb9c4aeb7597c59b51dbdd2359d",
+      "last_modified": "Mon, 23 Feb 2026 16:08:37 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/incidencias.txt",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/incidencias.txt",
+      "bytes": 143,
+      "sha256": "0eff3982d881e1714eb59d3553348f16e9ee02a5540ad37f92addd4a0cb15464",
+      "last_modified": "Thu, 27 Mar 2025 12:55:19 GMT"
+    },
+    {
+      "key": "estudios_basicos/estadisticos/viajes/2024/municipal_estadisticos_diasemana_intra.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/estadisticos/viajes/2024/municipal_estadisticos_diasemana_intra.csv",
+      "bytes": 1825876,
+      "sha256": "686856122a993b900bf87ae4d4ce410264aff7f71a8e3d054dfda604489aff4e",
+      "last_modified": "Tue, 09 Dec 2025 09:39:19 GMT"
+    },
+    {
+      "key": "estudios_basicos/estadisticos/viajes/2024/municipal_estadisticos_diasemana_inter.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/estadisticos/viajes/2024/municipal_estadisticos_diasemana_inter.csv",
+      "bytes": 2041280,
+      "sha256": "3aa57fca22573f4b6fefd22ef9bd4f20c72235d39abe5eeeb717d47e8d2b32e7",
+      "last_modified": "Tue, 09 Dec 2025 09:39:16 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202201_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202201_datos_agregados.csv",
+      "bytes": 1016,
+      "sha256": "04e27708a49b22e96c1cdbf4a6f94985384e8d05bdfe86809ee176a4316cecf0",
+      "last_modified": "Mon, 26 Jan 2026 14:17:43 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202202_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202202_datos_agregados.csv",
+      "bytes": 1015,
+      "sha256": "fb75b3612b0b1d93ca0afaa1d51970e0fe0f9038ee53521a0f40e878c9041eb8",
+      "last_modified": "Mon, 26 Jan 2026 14:17:53 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202203_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202203_datos_agregados.csv",
+      "bytes": 1016,
+      "sha256": "37528777327de61de7c90316a8018949e1b64abb5b98b0c9a4d77594c4c633d2",
+      "last_modified": "Mon, 26 Jan 2026 14:18:04 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202204_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202204_datos_agregados.csv",
+      "bytes": 1021,
+      "sha256": "52ca802459ad6a82cc3d4d4c3ceff29da14c060d8e2c3286a4c54def72508292",
+      "last_modified": "Mon, 26 Jan 2026 14:18:14 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202205_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202205_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "55ea9aa52221ebd494173b18a9f23d556f54efb5e2cb8caef65070881e48b972",
+      "last_modified": "Mon, 26 Jan 2026 14:18:23 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202206_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202206_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "f8f0b6a74cca1fb9174da911a711d5ccd10e38af2648a2bb13402604fa3fe58f",
+      "last_modified": "Mon, 26 Jan 2026 14:18:31 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202207_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202207_datos_agregados.csv",
+      "bytes": 1023,
+      "sha256": "a4ecde2dc4e1586db1c7661985d06de75cc4ece348882e838a6439bace490b4b",
+      "last_modified": "Mon, 26 Jan 2026 14:18:44 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202208_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202208_datos_agregados.csv",
+      "bytes": 1023,
+      "sha256": "6aa33f040d52eb0ccac706c80d779c0f77e899df53a1bea680e2702d2afcd323",
+      "last_modified": "Mon, 26 Jan 2026 14:18:55 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202209_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202209_datos_agregados.csv",
+      "bytes": 1021,
+      "sha256": "6993c4e661cb04d8d7407c7ba5915b633a585a972a4fbbb3437ecd71cfb7e76c",
+      "last_modified": "Mon, 26 Jan 2026 14:19:03 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202210_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202210_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "a0b67932ae14a62b5cc1b4fc5efe5030e13ffa20227e4b759fc3f2d2ddc5b42c",
+      "last_modified": "Mon, 26 Jan 2026 14:19:12 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202211_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202211_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "2b1324a205eb3cf387b0359f0096f30a18c35517bd1e1bcc89b2c9cfbcacd621",
+      "last_modified": "Mon, 26 Jan 2026 14:19:20 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202212_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202212_datos_agregados.csv",
+      "bytes": 1022,
+      "sha256": "86036a2b2e8379d815506f319ae83336be5b1182c7d5e2c6a796d8eab3071068",
+      "last_modified": "Mon, 26 Jan 2026 14:19:29 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202301_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202301_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "3f16a1b2b712fd0c818715b6a95815ecfc42658644b96182e905dcc207d7a994",
+      "last_modified": "Mon, 26 Jan 2026 14:19:38 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202302_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202302_datos_agregados.csv",
+      "bytes": 1017,
+      "sha256": "3cf2423ccedfe1948ed7406ec3e6b1b0e30962b006f0551ba01e514ff499eab6",
+      "last_modified": "Mon, 26 Jan 2026 14:19:47 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202303_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202303_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "249442ef40001af92f337691653bf10de771b0f7051c3ae5ac5298b0c4db4d16",
+      "last_modified": "Mon, 26 Jan 2026 14:19:59 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202304_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202304_datos_agregados.csv",
+      "bytes": 1022,
+      "sha256": "1259f66432d7d29f7d49beb5c8920b7de147d5f553957607be938d0b763a8637",
+      "last_modified": "Mon, 26 Jan 2026 14:20:09 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202305_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202305_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "29d3f362005c9d859ad87340bc166a03d0806e07211e571a499118c608f8dba0",
+      "last_modified": "Mon, 26 Jan 2026 14:20:19 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202306_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202306_datos_agregados.csv",
+      "bytes": 1021,
+      "sha256": "5651c5e8eee02f18024a87f8f27831b901e3aa08991ec83fddb569ac65383cd0",
+      "last_modified": "Mon, 26 Jan 2026 14:20:29 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202307_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202307_datos_agregados.csv",
+      "bytes": 1025,
+      "sha256": "36e7c05cf85f7cc8427327915bbc154ad524cf1cebdbaa23c7395eb4f5e39d90",
+      "last_modified": "Mon, 26 Jan 2026 14:20:38 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202308_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202308_datos_agregados.csv",
+      "bytes": 1025,
+      "sha256": "4b9499cc3107f4767108b49c6c86f83f888153bd1aad54308f039372a154b522",
+      "last_modified": "Mon, 26 Jan 2026 14:20:48 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202309_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202309_datos_agregados.csv",
+      "bytes": 1022,
+      "sha256": "72b631e7f70b8cb5c210385e846061f03f73cd7853592d00bf138351b646991b",
+      "last_modified": "Mon, 26 Jan 2026 14:21:00 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202312_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202312_datos_agregados.csv",
+      "bytes": 1022,
+      "sha256": "d1233e80f5c3d23c36db02de2cf3544acac4f14f1671afdb3dadec11c8f55fca",
+      "last_modified": "Mon, 26 Jan 2026 14:21:14 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202401_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202401_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "34469a31efc2fe25d8da3fbaaacd69f1d1dfd1f46219d7b950e69ebebb34fd89",
+      "last_modified": "Mon, 26 Jan 2026 14:21:26 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202402_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202402_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "0c5b9c0eae59c7f7d9771685009ef5617d614d3932dd2de0ec9a17d07f62a64a",
+      "last_modified": "Mon, 26 Jan 2026 14:21:38 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202403_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202403_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "37b0031e46bf1f7f1669e048b3c05b47a5b372b6ae1770377d2f363c48d52a20",
+      "last_modified": "Mon, 26 Jan 2026 14:21:50 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202404_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202404_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "482935ccc76137afb27faace2c9ef081063513de11661361736a66c35ee3d0b6",
+      "last_modified": "Mon, 26 Jan 2026 14:22:01 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202405_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202405_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "8547555c3d81d19248001a6e016b937d4428541a7cdf045def98fbaa16fec905",
+      "last_modified": "Mon, 26 Jan 2026 14:22:13 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202406_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202406_datos_agregados.csv",
+      "bytes": 1020,
+      "sha256": "ea4d1985af413cf39efb3bfde303b0ae9fca801dc19b12908e3e3eb0851601dd",
+      "last_modified": "Mon, 26 Jan 2026 14:22:25 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202407_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202407_datos_agregados.csv",
+      "bytes": 1023,
+      "sha256": "c391f98672277ceb75d5abad2e7277496afa8de126724f083e830b556211090f",
+      "last_modified": "Mon, 26 Jan 2026 14:22:39 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202408_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202408_datos_agregados.csv",
+      "bytes": 1023,
+      "sha256": "1cb9faeb34dec85fa6fb5fdf7e991fada9475254c09b2cc6f5265df822d04062",
+      "last_modified": "Mon, 26 Jan 2026 14:22:55 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202409_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202409_datos_agregados.csv",
+      "bytes": 1021,
+      "sha256": "6ba5d97e5ad33f75bf04233a555a25814168267502b7b96c49532e4cb6c999fb",
+      "last_modified": "Mon, 26 Jan 2026 14:23:07 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202410_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202410_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "e21211cdc0ef20a8d6451829794647aadf83973b075bbc6daa77fb373dae80ac",
+      "last_modified": "Mon, 26 Jan 2026 14:23:18 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202411_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202411_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "d1a19a3ffecea0066a5755e7908fce0b7fc65cd0d3c1b99efbd4d4ad5d4550bf",
+      "last_modified": "Mon, 26 Jan 2026 14:23:30 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202412_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202412_datos_agregados.csv",
+      "bytes": 1022,
+      "sha256": "906bec3b56f7af4e4bbac82b29df7ba3b8384170bdba347fa24f2526d8e4cf1b",
+      "last_modified": "Mon, 26 Jan 2026 14:23:42 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202501_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202501_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "0188cd1362e8fc43ef85c7a6f38cf1c15f790b3a62d355dfb61cc809a996b039",
+      "last_modified": "Mon, 26 Jan 2026 14:23:52 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202502_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202502_datos_agregados.csv",
+      "bytes": 1017,
+      "sha256": "845150357275a3c37deeb21f1183a5569821d1d399515f7e99eac3f04036df38",
+      "last_modified": "Mon, 26 Jan 2026 14:24:04 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202503_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202503_datos_agregados.csv",
+      "bytes": 1018,
+      "sha256": "d83cd1b8ff195e7e9ba9643c5d3ed863bb5cb675061462b283d2e1c715d8cd85",
+      "last_modified": "Mon, 26 Jan 2026 14:24:14 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202504_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202504_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "b12c5a6226aaa00c30db95777ea37fe85c2d07c6b33cf36031944972c6886260",
+      "last_modified": "Mon, 26 Jan 2026 14:24:26 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202505_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202505_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "816ffac9a7ad5976c31fb1a9aee4cb3f50fbb7a0b92e847c22f4309bcda9804d",
+      "last_modified": "Mon, 26 Jan 2026 14:24:38 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/202506_datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/202506_datos_agregados.csv",
+      "bytes": 1019,
+      "sha256": "17734fc539791a97594e59aa8626e51366f6386e1b67024693fc9dbec65aeaf4",
+      "last_modified": "Mon, 26 Jan 2026 14:24:51 GMT"
+    },
+    {
+      "key": "estudios_basicos/movilidad_agregada_mensual/datos_agregados.csv",
+      "url": "https://movilidad-opendata.mitma.es/estudios_basicos/movilidad_agregada_mensual/datos_agregados.csv",
+      "bytes": 41925,
+      "sha256": "cdc70bf73fe1620a06a02be7cec04a804819b076fef36bb2a306e7f53bbff85a",
+      "last_modified": "Mon, 26 Jan 2026 14:17:24 GMT"
+    },
+    {
+      "key": "ine/diccionario25.xlsx",
+      "url": "https://www.ine.es/daco/daco42/codmun/diccionario25.xlsx",
+      "bytes": 306558,
+      "sha256": "5cf83d5b9c68b4c39650b2f38cd60d817a2c9f90acc618b603e8c17ebd12ad07",
+      "last_modified": "Thu, 06 Feb 2025 10:00:01 GMT"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-11-03T18:17:41+0100",
+  "days": ["2024-10-16", "2024-10-19"],
+  "timings": [
+    {
+      "date": "2024-10-16",
+      "raw_rows": 14048375,
+      "trips": 148294497.919918,
+      "read_s": 16.1,
+      "total_s": 16.9,
+      "_row": "weekday"
+    },
+    {
+      "date": "2024-10-19",
+      "raw_rows": 13615948,
+      "trips": 129036113.42798,
+      "read_s": 16.5,
+      "total_s": 17.2,
+      "_row": "weekend"
+    }
+  ],
+  "muni_to_gau_conflicts": 0,
+  "zones": {
+    "municipal_centroids": 2735,
+    "gau_centroids": 2203
+  },
+  "weekday": {
+    "od_hour_rows": 1782672,
+    "od_band_purpose_rows": 4200039,
+    "parquet_mb": {
+      "od_hour": 11.4,
+      "od_band_purpose": 27.3
+    },
+    "distinct_pairs": 356667,
+    "total_trips": 148294498,
+    "intrazonal_share": 0.584,
+    "externo_share": 0.0002,
+    "interzonal_pairs": {
+      "ge5": 198263,
+      "ge100": 41280,
+      "ge1000": 10082
+    },
+    "partners_per_origin_ge5": {
+      "p50": 58,
+      "p90": 132,
+      "p99": 327.87,
+      "max": 1644
+    },
+    "area": {
+      "area_pairs": 180876,
+      "area_pairs_25km": 158630,
+      "inter_area_trips": 30957262.7329998,
+      "trips_25km": 10553803.83
+    },
+    "top600_area_share_of_inter_area": 0.284,
+    "hourly_profile": [2606394, 1421332, 1055636, 907799, 1069197, 1997155, 4233631, 7979059, 9154317, 8011911, 7169075, 7258207, 7467927, 8591864, 10211626, 9153069, 8360917, 8925879, 9464341, 9350617, 8493469, 6771315, 5285180, 3354582]
+  },
+  "weekend": {
+    "od_hour_rows": 1852913,
+    "od_band_purpose_rows": 4185558,
+    "parquet_mb": {
+      "od_hour": 11.8,
+      "od_band_purpose": 27.2
+    },
+    "distinct_pairs": 374853,
+    "total_trips": 129036113,
+    "intrazonal_share": 0.572,
+    "externo_share": 0.0002,
+    "interzonal_pairs": {
+      "ge5": 224732,
+      "ge100": 42233,
+      "ge1000": 9420
+    },
+    "partners_per_origin_ge5": {
+      "p50": 65,
+      "p90": 151,
+      "p99": 371.25,
+      "max": 1677
+    },
+    "area": {
+      "area_pairs": 187555,
+      "area_pairs_25km": 165329,
+      "inter_area_trips": 29716587.3139999,
+      "trips_25km": 11300801.769
+    },
+    "top600_area_share_of_inter_area": 0.266,
+    "hourly_profile": [3962108, 2253488, 1512464, 1194011, 1181418, 1525576, 2553740, 3387153, 4366879, 5799825, 6817613, 7660236, 8247665, 8784830, 8030782, 6541096, 6686105, 7218686, 7831082, 8275795, 8152159, 6965496, 5770664, 4317242]
+  }
+}

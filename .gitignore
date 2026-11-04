@@ -1,0 +1,18 @@
+node_modules/
+dist/
+data/raw/
+data/interim/
+data/rollup/
+.DS_Store
+*.tsbuildinfo
+reports/screenshots/
+renv/library/
+renv/staging/
+.Rhistory
+.RData
+test-results/
+playwright-report/
+data/geo/
+
+# Generated data release (reproducible: npm run data:publish)
+public/data/

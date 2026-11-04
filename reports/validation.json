@@ -1,0 +1,430 @@
+{
+  "release": "73b7b841ca",
+  "generated": "2026-11-04T08:52:59Z",
+  "passed": 13,
+  "failed": 0,
+  "checks": [
+    {
+      "id": "days.count",
+      "ok": true,
+      "detail": "71 of 71 calendar days streamed"
+    },
+    {
+      "id": "days.vs_monthly_official",
+      "ok": true,
+      "detail": "day / official monthly mean per day: 0.72–1.10 (weekdays 1.06, weekends 0.87 median)"
+    },
+    {
+      "id": "days.weekday_above_monthly_mean",
+      "ok": true,
+      "detail": "normal weekdays: median 1.058 of the monthly mean"
+    },
+    {
+      "id": "national.conservation",
+      "ok": true,
+      "detail": "halos = within-área + near; arcs = shipped; worst error 0.004%"
+    },
+    {
+      "id": "places.partners_plus_rest",
+      "ok": true,
+      "detail": "1170 places × keys × ways: partners + rest = total, worst error 0.230%"
+    },
+    {
+      "id": "places.madrid_balance",
+      "ok": true,
+      "detail": "Madrid out/in on a normal weekday: 0.998"
+    },
+    {
+      "id": "official_2024.within_zone",
+      "ok": true,
+      "detail": "2548 zones, r(log) = 0.9965, median ratio ours/official 1.029"
+    },
+    {
+      "id": "official_2024.between_zones",
+      "ok": true,
+      "detail": "departures + arrivals: r(log) = 0.9991, median ratio ours/official 1.024"
+    },
+    {
+      "id": "daytypes.ordering",
+      "ok": true,
+      "detail": "weekday 148.8 M > Saturday 127.0 M > Sunday 112.2 M"
+    },
+    {
+      "id": "daytypes.new_year_night",
+      "ok": true,
+      "detail": "trips 0–6h: New Year's Day 15.7% vs normal weekday 6.0%"
+    },
+    {
+      "id": "budget.national",
+      "ok": true,
+      "detail": "largest national file 124 KB gz (budget 150)"
+    },
+    {
+      "id": "budget.place",
+      "ok": true,
+      "detail": "largest place file 31 KB gz (budget 40)"
+    },
+    {
+      "id": "budget.search",
+      "ok": true,
+      "detail": "search index 58 KB gz (budget 80)"
+    }
+  ],
+  "days": [
+    {
+      "date": "2024-07-13",
+      "trips": 123006446,
+      "ratio": 0.912
+    },
+    {
+      "date": "2024-07-14",
+      "trips": 108187444,
+      "ratio": 0.802
+    },
+    {
+      "date": "2024-07-16",
+      "trips": 141815645,
+      "ratio": 1.052
+    },
+    {
+      "date": "2024-07-17",
+      "trips": 143122730,
+      "ratio": 1.061
+    },
+    {
+      "date": "2024-07-18",
+      "trips": 142578883,
+      "ratio": 1.057
+    },
+    {
+      "date": "2024-07-20",
+      "trips": 121113769,
+      "ratio": 0.898
+    },
+    {
+      "date": "2024-07-21",
+      "trips": 110493846,
+      "ratio": 0.819
+    },
+    {
+      "date": "2024-07-23",
+      "trips": 140583584,
+      "ratio": 1.043
+    },
+    {
+      "date": "2024-07-24",
+      "trips": 141608782,
+      "ratio": 1.05
+    },
+    {
+      "date": "2024-07-25",
+      "trips": 134075923,
+      "ratio": 0.994
+    },
+    {
+      "date": "2024-07-27",
+      "trips": 120457023,
+      "ratio": 0.893
+    },
+    {
+      "date": "2024-07-28",
+      "trips": 110128338,
+      "ratio": 0.817
+    },
+    {
+      "date": "2024-07-30",
+      "trips": 138891694,
+      "ratio": 1.03
+    },
+    {
+      "date": "2024-07-31",
+      "trips": 139486096,
+      "ratio": 1.034
+    },
+    {
+      "date": "2024-08-01",
+      "trips": 138703165,
+      "ratio": 1.1
+    },
+    {
+      "date": "2024-08-02",
+      "trips": 137271538,
+      "ratio": 1.089
+    },
+    {
+      "date": "2024-08-03",
+      "trips": 119895991,
+      "ratio": 0.951
+    },
+    {
+      "date": "2024-08-04",
+      "trips": 108714796,
+      "ratio": 0.862
+    },
+    {
+      "date": "2024-08-06",
+      "trips": 133243941,
+      "ratio": 1.057
+    },
+    {
+      "date": "2024-08-07",
+      "trips": 133575098,
+      "ratio": 1.06
+    },
+    {
+      "date": "2024-08-08",
+      "trips": 133457500,
+      "ratio": 1.059
+    },
+    {
+      "date": "2024-08-10",
+      "trips": 116910848,
+      "ratio": 0.927
+    },
+    {
+      "date": "2024-08-11",
+      "trips": 106820498,
+      "ratio": 0.847
+    },
+    {
+      "date": "2024-08-13",
+      "trips": 130056435,
+      "ratio": 1.032
+    },
+    {
+      "date": "2024-08-14",
+      "trips": 130410672,
+      "ratio": 1.035
+    },
+    {
+      "date": "2024-08-20",
+      "trips": 129803034,
+      "ratio": 1.03
+    },
+    {
+      "date": "2024-08-21",
+      "trips": 130775229,
+      "ratio": 1.037
+    },
+    {
+      "date": "2024-08-22",
+      "trips": 130873117,
+      "ratio": 1.038
+    },
+    {
+      "date": "2024-08-24",
+      "trips": 116783273,
+      "ratio": 0.926
+    },
+    {
+      "date": "2024-08-25",
+      "trips": 107392868,
+      "ratio": 0.852
+    },
+    {
+      "date": "2024-10-01",
+      "trips": 151096732,
+      "ratio": 1.07
+    },
+    {
+      "date": "2024-10-02",
+      "trips": 148978922,
+      "ratio": 1.055
+    },
+    {
+      "date": "2024-10-03",
+      "trips": 152354175,
+      "ratio": 1.079
+    },
+    {
+      "date": "2024-10-05",
+      "trips": 130920007,
+      "ratio": 0.927
+    },
+    {
+      "date": "2024-10-06",
+      "trips": 114697836,
+      "ratio": 0.813
+    },
+    {
+      "date": "2024-10-08",
+      "trips": 149421701,
+      "ratio": 1.059
+    },
+    {
+      "date": "2024-10-09",
+      "trips": 143198750,
+      "ratio": 1.014
+    },
+    {
+      "date": "2024-10-10",
+      "trips": 151854667,
+      "ratio": 1.076
+    },
+    {
+      "date": "2024-10-15",
+      "trips": 146819086,
+      "ratio": 1.04
+    },
+    {
+      "date": "2024-10-16",
+      "trips": 148294498,
+      "ratio": 1.051
+    },
+    {
+      "date": "2024-10-17",
+      "trips": 148164140,
+      "ratio": 1.05
+    },
+    {
+      "date": "2024-10-19",
+      "trips": 129036113,
+      "ratio": 0.914
+    },
+    {
+      "date": "2024-10-20",
+      "trips": 114786138,
+      "ratio": 0.813
+    },
+    {
+      "date": "2024-10-22",
+      "trips": 147973397,
+      "ratio": 1.048
+    },
+    {
+      "date": "2024-10-23",
+      "trips": 148427847,
+      "ratio": 1.052
+    },
+    {
+      "date": "2024-10-24",
+      "trips": 149853148,
+      "ratio": 1.062
+    },
+    {
+      "date": "2024-10-26",
+      "trips": 123570046,
+      "ratio": 0.875
+    },
+    {
+      "date": "2024-10-27",
+      "trips": 110143052,
+      "ratio": 0.78
+    },
+    {
+      "date": "2024-12-24",
+      "trips": 122583218,
+      "ratio": 0.92
+    },
+    {
+      "date": "2025-01-01",
+      "trips": 95788910,
+      "ratio": 0.717
+    },
+    {
+      "date": "2025-02-01",
+      "trips": 125884017,
+      "ratio": 0.901
+    },
+    {
+      "date": "2025-02-02",
+      "trips": 109030670,
+      "ratio": 0.78
+    },
+    {
+      "date": "2025-02-04",
+      "trips": 147736942,
+      "ratio": 1.057
+    },
+    {
+      "date": "2025-02-05",
+      "trips": 148816172,
+      "ratio": 1.065
+    },
+    {
+      "date": "2025-02-06",
+      "trips": 148621721,
+      "ratio": 1.064
+    },
+    {
+      "date": "2025-02-08",
+      "trips": 125417215,
+      "ratio": 0.898
+    },
+    {
+      "date": "2025-02-09",
+      "trips": 110808821,
+      "ratio": 0.793
+    },
+    {
+      "date": "2025-02-11",
+      "trips": 147117867,
+      "ratio": 1.053
+    },
+    {
+      "date": "2025-02-12",
+      "trips": 146619902,
+      "ratio": 1.049
+    },
+    {
+      "date": "2025-02-13",
+      "trips": 149801221,
+      "ratio": 1.072
+    },
+    {
+      "date": "2025-02-15",
+      "trips": 128109223,
+      "ratio": 0.917
+    },
+    {
+      "date": "2025-02-16",
+      "trips": 112916115,
+      "ratio": 0.808
+    },
+    {
+      "date": "2025-02-18",
+      "trips": 147504550,
+      "ratio": 1.056
+    },
+    {
+      "date": "2025-02-19",
+      "trips": 149083673,
+      "ratio": 1.067
+    },
+    {
+      "date": "2025-02-20",
+      "trips": 150335923,
+      "ratio": 1.076
+    },
+    {
+      "date": "2025-02-22",
+      "trips": 125718362,
+      "ratio": 0.9
+    },
+    {
+      "date": "2025-02-23",
+      "trips": 112749041,
+      "ratio": 0.807
+    },
+    {
+      "date": "2025-02-25",
+      "trips": 147824466,
+      "ratio": 1.058
+    },
+    {
+      "date": "2025-02-26",
+      "trips": 150264072,
+      "ratio": 1.075
+    },
+    {
+      "date": "2025-02-27",
+      "trips": 150723082,
+      "ratio": 1.079
+    },
+    {
+      "date": "2025-04-16",
+      "trips": 142465082,
+      "ratio": 1.1
+    }
+  ]
+}
