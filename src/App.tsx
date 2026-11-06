@@ -38,8 +38,10 @@ export function App() {
           </p>
         )}
         <TuLugar />
-        <Race />
-        <OddDays />
+        <div className="pair">
+          <Race />
+          <OddDays />
+        </div>
         <Methods />
       </main>
       <Footer />

@@ -5,10 +5,12 @@
 #   national/<key>.json      área-level arcs with 24-hour vectors, plus per-área halos
 #   regional/<prov>-<key>.json  municipal arcs touching a province, plus halos
 #   places/<zone>.json       one place, every day key: partners both ways, hourly totals,
-#                            distance bands and purpose (typical days); a short summary for special days
+#                            distance bands (trips starting here, and arriving from elsewhere)
+#                            and purpose (typical days); a short summary for special days
 #   search.json              every INE municipality name -> its zone
-#   race.json                La carrera: per key, every place in an hour's top 12 (total or
-#                            per resident), with its 24-hour arrivals from other Spanish places
+#   race.json                La carrera: per key and direction, every place in an hour's top 12
+#                            (total or per resident), with its 24-hour arrivals from (or
+#                            departures to) other Spanish places
 #
 # Values are average trips starting in each hour on the typical day (or on the
 # special day itself). Which arcs are *drawn* is decided on screen (docs/DECISIONS.md);
@@ -225,21 +227,26 @@ publish_key <- function(key, out) {
                        sum(t) FILTER (WHERE o <> d) AS fuera FROM bp GROUP BY o, band")
     purpose <- q("SELECT o AS place, 'out' AS way, purpose, sum(t) AS t FROM bp WHERE o <> d GROUP BY ALL
                   UNION ALL SELECT d, 'in', purpose, sum(t) FROM bp WHERE o <> d GROUP BY ALL")
-    extra <- list(bands = bands, purpose = purpose)
+    bands_in <- q("SELECT d AS place, band, sum(t) AS llegan FROM bp WHERE o <> d GROUP BY d, band")
+    extra <- list(bands = bands, bands_in = bands_in, purpose = purpose)
   }
   place_parts[[key]] <<- list(special = special, ranked = ranked, hourly = hourly, extra = extra)
 
-  # --- La carrera: arrivals from other Spanish places, by hour ----------------------------
-  arr <- fill0(q(sprintf("
-    SELECT od.d AS z, %s FROM od JOIN zones zo ON zo.id = od.o JOIN zones zd ON zd.id = od.d
-    WHERE od.o <> od.d AND regexp_matches(zo.prov, '^[0-9]+$') AND regexp_matches(zd.prov, '^[0-9]+$')
-    GROUP BY od.d ORDER BY od.d", hours_sql)))
-  m <- as.matrix(arr[, ..H])
-  popv <- zones$pop[match(arr$z, zones$id)]
-  pc <- m / ifelse(!is.na(popv) & popv >= RACE_MIN_POP, popv, NA)
-  topn <- function(x) { x[is.na(x)] <- -Inf; head(order(-x, arr$z), RACE_TOP) }
-  keep <- sort(unique(unlist(lapply(seq_along(H), function(j) c(topn(m[, j]), topn(pc[, j]))))))
-  race_parts[[key]] <<- list(zone = I(zones$idx[match(arr$z[keep], zones$id)]), h = hmat(arr[keep]))
+  # --- La carrera: trips between different Spanish places, by hour ------------------------
+  # "in": arrivals by destination; "out": departures by origin. Trips inside a place never count.
+  race_side <- function(col) {
+    x <- fill0(q(sprintf("
+      SELECT od.%s AS z, %s FROM od JOIN zones zo ON zo.id = od.o JOIN zones zd ON zd.id = od.d
+      WHERE od.o <> od.d AND regexp_matches(zo.prov, '^[0-9]+$') AND regexp_matches(zd.prov, '^[0-9]+$')
+      GROUP BY od.%s ORDER BY od.%s", col, hours_sql, col, col)))
+    m <- as.matrix(x[, ..H])
+    popv <- zones$pop[match(x$z, zones$id)]
+    pc <- m / ifelse(!is.na(popv) & popv >= RACE_MIN_POP, popv, NA)
+    topn <- function(v) { v[is.na(v)] <- -Inf; head(order(-v, x$z), RACE_TOP) }
+    keep <- sort(unique(unlist(lapply(seq_along(H), function(j) c(topn(m[, j]), topn(pc[, j]))))))
+    list(zone = I(zones$idx[match(x$z[keep], zones$id)]), h = hmat(x[keep]))
+  }
+  race_parts[[key]] <<- list(`in` = race_side("d"), out = race_side("o"))
 
   list(
     trips = round(totals$all_trips),
@@ -294,6 +301,7 @@ parts <- lapply(place_parts, function(pp) list(
   special = pp$special,
   ranked = split_by(pp$ranked), hourly = split_by(pp$hourly),
   bands = if (length(pp$extra)) split_by(pp$extra$bands) else NULL,
+  bands_in = if (length(pp$extra)) split_by(pp$extra$bands_in) else NULL,
   purpose = if (length(pp$extra)) split_by(pp$extra$purpose) else NULL))
 way_obj <- function(rk, dirn, special, total) {
   x <- rk[way == dirn][order(r)]
@@ -317,8 +325,10 @@ for (pid in zones[foreign == FALSE, id]) {
       `in` = way_obj(rk, "in", pp$special, sum(h$`in`)))
     if (!pp$special) {
       bd <- pp$bands[[pid]] %||% data.table(band = integer(), dentro = numeric(), fuera = numeric())
+      bi <- pp$bands_in[[pid]] %||% data.table(band = integer(), llegan = numeric())
       o$bands <- list(dentro = I(r0(vapply(0:3, function(b) sum(bd[band == b, dentro], na.rm = TRUE), 0))),
-                      fuera = I(r0(vapply(0:3, function(b) sum(bd[band == b, fuera], na.rm = TRUE), 0))))
+                      fuera = I(r0(vapply(0:3, function(b) sum(bd[band == b, fuera], na.rm = TRUE), 0))),
+                      llegan = I(r0(vapply(0:3, function(b) sum(bi[band == b, llegan], na.rm = TRUE), 0))))
       pu <- pp$purpose[[pid]] %||% data.table(way = character(), purpose = character(), t = numeric())
       o$purpose <- lapply(c(out = "out", `in` = "in"), function(w)
         I(r0(vapply(PURPOSES, function(x) sum(pu[way == w & purpose == x, t]), 0, USE.NAMES = FALSE))))

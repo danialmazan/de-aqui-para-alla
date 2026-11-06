@@ -36,7 +36,14 @@ test('a shared link restores place, direction and day', async ({ page }) => {
   await ready(page);
   await expect(page.locator('#tu-lugar h2')).toContainText('Barcelona');
   await expect(page.locator('#tu-lugar').getByRole('button', { name: 'Llegan' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.hero-note')).toContainText('Sábado normal');
+  await expect(page.locator('#dia-pagina')).toHaveValue('sabado');
+  await expect(page.locator('.tl-grid .day-pill').first()).toHaveText('Sábado normal');
+  // The day's reset goes back to a normal weekday; the map's reset drops the place.
+  await page.locator('.day-pick-row .reset-btn').click();
+  await expect(page).not.toHaveURL(/dia=/);
+  await page.locator('.map-reset').click();
+  await expect(page).not.toHaveURL(/lugar=/);
+  await expect(page.locator('#tu-lugar h2')).toContainText('Madrid');
 });
 
 test('reduced motion: nothing autoplays', async ({ browser }) => {
@@ -96,15 +103,33 @@ test('the explanation opens on request; the time panel minimises and restores', 
 test('compare a day, the race and the odd days', async ({ page }) => {
   await page.goto('./');
   await ready(page);
-  await page.locator('.cmp-pick select').selectOption('sabado');
-  await expect(page.locator('.cmp-delta')).toContainText('Frente a un sábado normal');
+  // El pulso: compare, name both days, then reset.
+  const cmp = page.locator('.tl-heartbeat .cmp-pick');
+  await expect(cmp.locator('.reset-btn')).toBeDisabled();
+  await cmp.locator('select').selectOption('sabado');
+  await expect(page.locator('.cmp-delta')).toContainText('en un laborable normal');
+  await expect(page.locator('.cmp-delta')).toContainText('que en un sábado normal');
+  await cmp.locator('.reset-btn').click();
+  await expect(page.locator('.cmp-delta')).toHaveCount(0);
+  await expect(page.locator('.tl-grid .day-pill')).toHaveCount(4);
+  await expect(page.locator('.tl-grid .day-pill').first()).toHaveText('Laborable normal');
+
+  // La carrera: all of Spain, total by default, its own day.
   await page.locator('#carrera').scrollIntoViewIfNeeded();
   await expect(page.locator('#carrera .ranking li')).toHaveCount(10);
-  await page.locator('#carrera').getByRole('button', { name: 'En total' }).click();
   await page.locator('.race-hour').fill('8');
   await expect(page.locator('#carrera .ranking li[aria-posinset="1"] .rk-name')).toHaveText('Madrid');
+  await page.locator('#carrera').getByRole('button', { name: 'Orígenes' }).click();
+  await expect(page.locator('#carrera .ranking li')).toHaveCount(10);
+  const y = await page.evaluate(() => window.scrollY);
+  await page.locator('#carrera select').selectOption('domingo');
+  await expect(page).not.toHaveURL(/dia=/);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - y)).toBeLessThan(2);
+  await page.locator('#carrera .reset-btn').click();
+  await expect(page.locator('#carrera select')).toHaveValue('laborable');
+
   await expect(page.locator('.odd-card')).toHaveCount(4);
-  const axe = await new AxeBuilder({ page }).include('#carrera').include('#dias-raros').include('.tl-heartbeat').analyze();
+  const axe = await new AxeBuilder({ page }).include('#carrera').include('#dias-raros').include('.tl-grid').analyze();
   const serious = axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' ')}`)).toEqual([]);
   await page.locator('.odd-card').filter({ hasText: 'Año Nuevo' }).getByRole('button').click();

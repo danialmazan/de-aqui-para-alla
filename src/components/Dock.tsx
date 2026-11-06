@@ -13,6 +13,7 @@ import { LANG, t } from '../lib/copy.ts';
 import type { Manifest } from '../lib/data.ts';
 import { formatHour, formatInt } from '../lib/format.ts';
 import { REDUCED, useClockHour, usePlaying } from '../lib/hooks.ts';
+import { DAY_PICKER_ID, ResetButton } from './DayTools.tsx';
 import { Icon } from './Controls.tsx';
 
 /** Direction key: each dot starts amber where trips leave and turns aqua where they arrive. */
@@ -98,7 +99,7 @@ export function Dock({ manifest, dayKey, onDay, unit, mobile, placeOpen, placeRo
       </button>
       <div className="clock">
         <span className="num clock-time">{formatHour(hour)}</span>
-        <span className="clock-label">{t.dock.clockLabel}</span>
+        <span className="sr-only">{t.dock.clockLabel}</span>
       </div>
       <div className="scrub">
         <svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true">
@@ -116,9 +117,10 @@ export function Dock({ manifest, dayKey, onDay, unit, mobile, placeOpen, placeRo
           <Icon name="chevron" />
         </button>
       )}
+      <div className="day-pick-row">
       <label className="day-pick">
         <span className="sr-only">{t.dock.day}</span>
-        <select value={dayKey} onChange={(e) => onDay(e.target.value)}>
+        <select id={DAY_PICKER_ID} value={dayKey} onChange={(e) => onDay(e.target.value)}>
           <optgroup label={t.dock.typicalDays}>
             {entries.filter(([, d]) => d.kind === 'typical').map(([k, d]) => <option key={k} value={k}>{d.label[LANG]}</option>)}
           </optgroup>
@@ -127,6 +129,8 @@ export function Dock({ manifest, dayKey, onDay, unit, mobile, placeOpen, placeRo
           </optgroup>
         </select>
       </label>
+      <ResetButton label={t.dock.resetDay} active={dayKey !== 'laborable'} onReset={() => onDay('laborable')} />
+      </div>
       {placeRow && <div className="dock-place">{placeRow}</div>}
       {expanded && (
         <div className="dock-more">

@@ -68,9 +68,20 @@ The map opens on the Madrid area at municipal detail rather than the full penins
 
 ## La carrera, Días raros and day comparison (6 Nov 2026)
 
-- **La carrera** (section 02) ranks places by trips arriving from other Spanish municipalities in each hour, on the chosen day key. It follows the shared clock and day. Two measures:
-  - **Por vecino** (default): arrivals per 1,000 residents, in municipalities over 20,000 people. Counted raw, Madrid and Barcelona lead every hour; per resident, business parks, campuses, airports and beaches stand out.
-  - **En total**: raw arrivals.
-  - Data: `race.json` (35 KB gz, loaded when the section nears the screen). It holds every place in any hour's top 12 by either measure, with 24-hour arrivals. Built in `05_publish.R`.
+- **La carrera** (section 02) covers all of Spain, never the selected place. It ranks municipalities by trips **arriving from** other Spanish municipalities (Destinos, the default) or **leaving for** them (Orígenes), in each hour. Trips within a municipality never count. It follows the shared clock. Two measures:
+  - **Total** (default, 7 Nov 2026): raw trips. Madrid and Barcelona lead most hours.
+  - **Por habitante**: per 1,000 residents, in municipalities over 20,000 people. Arrivals: business parks, campuses, airports and beaches stand out. Departures: suburbs next to a big city in the morning rush, then the towns with business parks, campuses and shopping centres in the afternoon.
+  - The card has **its own day**. It starts as the page's day, a pick holds until the page's day changes, and ↺ brings it back. Changing it never changes the rest of the page; when it changed the page's day, the Tu lugar cards above changed height and the page jumped.
+  - Data: `race.json`, loaded when the section nears the screen. Per day key and direction, it holds every place in any hour's top 12 by either measure, with its 24-hour values (71 KB gz). Built in `05_publish.R`.
+- **Day pills** (7 Nov 2026): Tu lugar's cards show the page's day as a small pill at the top right. Tapping it scrolls to the map's day picker, which is the one control for the page's day, and flashes it.
 - **Días raros** (section 03): the four special days as small multiples of national trips per hour, each against its manifest `compare` day. The hour with the largest relative change is marked. Each card's one-line story is hand-written and was checked against those hourly changes.
-- **Comparar con** in Tu lugar's pulse chart: draws any other day key for the same place, dashed on the same scale. It reports the change in daily departures and arrivals. Special days start compared with their typical day.
+- **Comparar con** in Tu lugar's pulse chart: draws any other day key for the same place, dashed on the same scale. The sentence underneath names both days and gives the change in daily departures and arrivals. Special days start compared with their typical day; ↺ removes the comparison.
+
+## Layout pass (7 Nov 2026)
+
+- **Distance chart follows Salen/Llegan.** It used to show only trips starting in the place, because the release only had distance bands by origin. Place files now also carry `bands.llegan`: trips arriving from elsewhere, by band. Trips within the place count in both directions.
+- **Resets.** ↺ next to the map's day picker goes back to a normal weekday. ↺ by the search box (to its right on phones; beside "Ver toda España" on desktop) flies back to the opening view and drops the selected place.
+- **Desktop Tu lugar:** ranking and pulse share the first row at the same height; distance and purpose sit side by side below.
+- **02 and 03 side by side** from 1,100 px wide, with Días raros' four cards stacked (text left, chart right). Below that width they stay one after the other.
+- **Place card on the map** fits its top 5 without scrolling down to 760 px tall: the day line above the search hides while a place card shows (the dock still names the day), and the Salen/Llegan switch shares a row with its heading.
+

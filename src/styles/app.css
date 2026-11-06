@@ -34,7 +34,13 @@ a { color: var(--ink); }
 .chip-btn:hover { border-color: #3a5a78; }
 .chip-btn:active { transform: scale(0.98); }
 .chip-btn.ghost { background: transparent; color: var(--muted); }
-.view-btn { margin-top: 12px; pointer-events: auto; }
+.search-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; pointer-events: auto; }
+.search-row .search { margin-top: 0; flex: 1; min-width: 0; }
+.view-row { display: flex; gap: 8px; margin-top: 10px; pointer-events: auto; }
+.view-btn { flex: 1; justify-content: center; }
+.map-reset { width: 40px; height: 40px; background: var(--panel); color: var(--ink); }
+.search-row .map-reset { width: 48px; height: 48px; }
+.map-reset svg { width: 19px; height: 19px; }
 
 .lang-float {
   position: absolute; z-index: 4; top: var(--gutter); right: var(--gutter);
@@ -52,7 +58,8 @@ a { color: var(--ink); }
 .dock .play { grid-area: play; }
 .dock .clock { grid-area: clock; }
 .dock .scrub { grid-area: scrub; }
-.dock .day-pick { grid-area: day; }
+.dock .day-pick-row { grid-area: day; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dock .day-pick { flex: 1; min-width: 0; }
 .dock .dock-toggle { grid-area: toggle; }
 .dock .sheet-handle { grid-area: handle; }
 .dock .dock-place { grid-area: place; }
@@ -66,23 +73,24 @@ a { color: var(--ink); }
   gap: 8px 16px; padding: 14px 12px 12px 18px;
 }
 .dock.panel.is-min { width: min(460px, calc(100% - 2 * var(--gutter))); gap: 6px 12px; padding: 10px 10px 10px 12px; }
-.dock.panel.is-min .play { width: 36px; height: 36px; }
-.dock.panel.is-min .play svg { width: 18px; height: 18px; }
-.dock.panel.is-min .clock-time { font-size: 24px; }
+.dock.panel.is-min .play { width: 32px; height: 32px; }
+.dock.panel.is-min .play svg { width: 16px; height: 16px; }
+.dock.panel.is-min .clock-time { font-size: 22px; }
 .dock.panel.is-min .clock-label { display: none; }
 .dock.panel.is-min .scrub { height: 40px; }
 .dock.panel.is-min .day-pick select { min-height: 34px; font-size: 13px; }
 
 .play {
-  width: 46px; height: 46px; border-radius: 50%;
+  width: 38px; height: 38px; border-radius: 50%;
   display: grid; place-items: center;
   border: 0; background: var(--ink); color: var(--night-0); cursor: pointer;
   transition: transform var(--t-micro) var(--ease);
 }
 .play:active { transform: scale(0.96); }
-.play svg { width: 22px; height: 22px; fill: currentColor; }
+.play svg { width: 18px; height: 18px; fill: currentColor; }
 .clock { display: grid; line-height: 1; }
-.clock-time { font-size: clamp(34px, 4.6vw, 50px); font-weight: 500; letter-spacing: -0.03em; }
+/* Line box trimmed to the digits, so the clock and the play button share a centre. */
+.clock-time { display: block; font-size: clamp(28px, 3.2vw, 36px); font-weight: 500; letter-spacing: -0.03em; line-height: 0.74; padding-top: 0.04em; }
 .clock-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
 .dock-toggle {
@@ -120,8 +128,14 @@ a { color: var(--ink); }
 }
 .sheet-handle span[aria-hidden] { width: 40px; height: 4px; border-radius: 2px; background: var(--line); }
 
-.place-row { display: flex; align-items: center; gap: 8px; }
-.pr-name { font-family: var(--serif); font-weight: 500; font-size: 20px; letter-spacing: -0.02em; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.place-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+/* The place's name and its X as one chip (like the place pill in the compact bar). */
+.pr-chip {
+  display: inline-flex; align-items: center; gap: 8px; min-width: 0; min-height: 36px; padding: 0 10px 0 14px;
+  border-radius: 18px; border: 1px solid var(--aqui); background: rgba(255, 181, 71, 0.1); color: var(--ink); font: inherit; cursor: pointer;
+}
+.pr-chip .icon { width: 14px; height: 14px; flex: none; color: var(--muted); }
+.pr-name { font-family: var(--serif); font-weight: 500; font-size: 18px; letter-spacing: -0.02em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* The page continues below the map: a slim strip says so (and links there). */
 .hero-next {
@@ -181,7 +195,7 @@ a { color: var(--ink); }
 
 /* ---------- Place card (map) ---------- */
 .place-card {
-  margin-top: 12px; pointer-events: auto; width: 100%; flex: 0 1 auto; min-height: 0; overflow-y: auto;
+  margin-top: 10px; pointer-events: auto; width: 100%; flex: 0 1 auto; min-height: 0; overflow-y: auto;
   padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   display: grid; gap: 10px;
 }
@@ -206,7 +220,10 @@ a { color: var(--ink); }
 .pc-kpis dt i { width: 8px; height: 8px; border-radius: 50%; }
 .pc-kpis dd { margin: 4px 0 0; font-size: 20px; font-weight: 500; letter-spacing: -0.02em; white-space: nowrap; }
 .pc-note { margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
-.pc-top-title { margin: 4px 0 0; }
+.pc-unit { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.pc-top-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.pc-top-title { margin: 0; }
+.pc-top-head .segmented button { min-height: 32px; padding: 0 10px; font-size: 13px; }
 
 .segmented { display: inline-flex; padding: 3px; gap: 2px; background: var(--night-3); border-radius: var(--radius); justify-self: start; }
 .segmented button {
@@ -267,6 +284,35 @@ a { color: var(--ink); }
 .card-note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
 .card .chip-btn { justify-self: start; }
 .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.card-head .card-title { min-width: 0; }
+.card-toggles, .race-toggles { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+
+/* The page's day on a card: tap to go up to the map's day picker. */
+.day-pill {
+  flex-shrink: 0; margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 28px; padding: 0 11px; border-radius: 14px; border: 1px solid var(--line);
+  background: transparent; color: var(--muted); font: inherit; font-size: 12.5px; white-space: nowrap; cursor: pointer;
+  transition: color var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease);
+}
+.day-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--focus); opacity: 0.8; }
+.day-pill:hover { color: var(--ink); border-color: #3a5a78; }
+.day-pick.flash select { animation: pick-flash 1.6s var(--ease); }
+@keyframes pick-flash {
+  0%, 60% { box-shadow: 0 0 0 3px var(--focus); border-color: var(--focus); }
+  100% { box-shadow: 0 0 0 3px transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .day-pick.flash select { animation-duration: 2.4s; } }
+
+/* In-card day pickers and their reset (circle and arrow) button. */
+.day-row { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.reset-btn {
+  flex-shrink: 0; width: 34px; height: 34px; display: inline-grid; place-items: center; padding: 0;
+  border-radius: 50%; border: 1px solid var(--line); background: var(--night-3); color: var(--ink); cursor: pointer;
+  transition: border-color var(--t-ui) var(--ease), opacity var(--t-ui) var(--ease);
+}
+.reset-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.reset-btn:hover:not(:disabled) { border-color: #3a5a78; }
+.reset-btn:disabled { opacity: 0.35; cursor: default; }
 
 .kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: auto auto auto; gap: 0 10px; margin-bottom: 12px; }
 .kpi-card { padding: 12px 14px; grid-row: span 3; display: grid; grid-template-rows: subgrid; }
@@ -282,8 +328,7 @@ a { color: var(--ink); }
 .ten .out { background: transparent; border: 1.5px solid var(--aqui); }
 
 .tl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.tl-ranking { grid-row: span 3; }
-.tl-nodetail { grid-column: 2; }
+.tl-nodetail { grid-column: 1 / -1; }
 
 .ranking { position: relative; list-style: none; margin: 0; padding: 0; }
 .ranking li {
@@ -304,12 +349,14 @@ a { color: var(--ink); }
 .rk-pick { position: absolute; inset: 0; z-index: 1; border: 0; padding: 0; background: transparent; cursor: pointer; border-radius: var(--radius); }
 
 /* ---------- 02 La carrera ---------- */
+.race .section-head, .odd .section-head { max-width: 760px; }
 .race-card { max-width: 760px; }
 .race-controls { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 10px 14px; }
 .play.small { width: 36px; height: 36px; }
 .play.small svg { width: 18px; height: 18px; }
 .race-time { font-size: 26px; line-height: 1; font-weight: 500; letter-spacing: -0.03em; }
 .race-hour { width: 100%; accent-color: var(--alla); }
+.race-card > .card-title { margin-top: 4px; }
 .race-loading { background: linear-gradient(90deg, transparent, var(--night-3), transparent); opacity: 0.4; border-radius: var(--radius); }
 
 /* ---------- 03 Días raros ---------- */
@@ -356,7 +403,8 @@ a { color: var(--ink); }
 .hb-cmp { stroke-width: 1.6; stroke-dasharray: 4 4; opacity: 0.55; }
 .hb-key .hb-was { color: var(--muted); font-size: 13px; }
 .hb-key .hb-was-key i { width: 14px; height: 0; border-radius: 0; border-top: 2px dashed var(--muted); vertical-align: middle; }
-.cmp-pick { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); justify-self: start; }
+.cmp-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; color: var(--muted); justify-self: start; max-width: 100%; }
+.day-row select { min-width: 0; text-overflow: ellipsis; }
 .cmp-pick select, .race-day select {
   min-height: 34px; padding: 0 10px; border-radius: var(--radius); max-width: 100%;
   border: 1px solid var(--line); background: var(--night-3); color: var(--ink); font: inherit; font-size: 13px;
@@ -368,6 +416,7 @@ a { color: var(--ink); }
 .bd-track, .pu-track { height: 12px; display: flex; background: var(--night-3); border-radius: 6px; overflow: hidden; }
 .bd-in { background: var(--dentro); transition: width var(--t-chart) var(--ease); }
 .bd-out { background: var(--aqui); transition: width var(--t-chart) var(--ease); }
+.bands[data-tone='alla'] .bd-out { background: var(--alla); }
 .pu-fill { width: 100%; transform-origin: left; transition: transform var(--t-chart) var(--ease); }
 .purposes[data-tone='aqui'] .pu-fill { background: var(--aqui); }
 .purposes[data-tone='alla'] .pu-fill { background: var(--alla); }
@@ -438,9 +487,9 @@ a { color: var(--ink); }
 
 @media (max-width: 767px) {
   .race-controls { grid-template-columns: auto auto minmax(0, 1fr); }
-  .race .ranking li { grid-template-columns: 1.4em minmax(0, 1.4fr) minmax(0, 1fr) 4.2em; }
+  .race .ranking li { grid-template-columns: 1.4em minmax(0, 2.2fr) minmax(0, 1fr) 3.4em; }
   .race-day { grid-column: 1 / -1; }
-  .race-day select { width: 100%; }
+  .race-day select { flex: 1; min-width: 0; }
   /* Días raros: a swipeable row of cards rather than four screens of them. */
   .odd-grid {
     grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 84%;
@@ -452,6 +501,9 @@ a { color: var(--ink); }
   .hero-wordmark { width: min(250px, 100%); }
   .hero-note { display: none; }
   .search { margin-top: 10px; }
+  /* Below the title the EN button's column is free: the search row uses it. */
+  .search-row, .view-row { width: calc(100% + 56px); }
+  .search-row { margin-top: 10px; }
   .lang-float { top: 14px; }
   .view-btn { min-height: 36px; font-size: 13px; margin-top: 8px; }
   .perf { top: auto; bottom: 200px; right: auto; left: var(--gutter); }
@@ -467,13 +519,12 @@ a { color: var(--ink); }
   }
   /* Open, the sheet reaches half the screen at most and scrolls inside. */
   .dock.sheet.is-open { max-height: 50svh; overflow-y: auto; }
-  .dock.sheet .play { width: 38px; height: 38px; }
-  .dock.sheet .play svg { width: 18px; height: 18px; }
-  .dock.sheet .clock-time { font-size: 26px; }
+  .dock.sheet .play { width: 34px; height: 34px; }
+  .dock.sheet .play svg { width: 16px; height: 16px; }
+  .dock.sheet .clock-time { font-size: 24px; }
   .dock.sheet .clock-label { display: none; }
   .dock.sheet .scrub { height: 40px; }
   .dock.sheet .place-row .segmented button { min-height: 34px; padding: 0 10px; font-size: 13px; }
-  .dock.sheet .place-row .pc-close { width: 36px; height: 36px; }
   .dock.sheet .pc-kpis dd { font-size: 17px; }
 
   .section { padding: 32px var(--gutter); }
@@ -492,4 +543,40 @@ a { color: var(--ink); }
   .footer { grid-template-columns: auto 1fr; }
   .footer-credit { text-align: right; }
   .footer-home { display: none; }
+}
+
+/* ---------- 02 and 03 side by side on wide screens ---------- */
+@media (min-width: 1100px) {
+  .pair {
+    max-width: 1440px; margin: 0 auto; border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start;
+  }
+  .pair > .section { max-width: none; margin: 0; border-top: 0; }
+  .pair > .section + .section { padding-left: 12px; }
+  .pair > .section:first-child { padding-right: 12px; }
+  .pair .section-head, .pair .race-card { max-width: none; }
+  /* Días raros: the four days stacked, each card text on the left, chart on the right. */
+  .pair .odd-grid { grid-template-columns: minmax(0, 1fr); }
+  .pair .odd-card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); column-gap: 18px; align-items: start;
+    grid-template-areas: "head shape" "fig shape" "story shape" "total key" "btn key";
+  }
+  .pair .odd-head { grid-area: head; }
+  .pair .odd-figure { grid-area: fig; }
+  .pair .odd-story { grid-area: story; }
+  .pair .odd-total { grid-area: total; }
+  .pair .odd-btn { grid-area: btn; }
+  .pair .odd-shape { grid-area: shape; align-self: center; }
+  .pair .odd-key { grid-area: key; }
+}
+
+/* ---------- Phone: two toggles share one row ---------- */
+@media (max-width: 767px) {
+  .card-toggles, .race-toggles { flex-wrap: nowrap; gap: 6px; }
+  .card-toggles .segmented button, .race-toggles .segmented button { min-height: 34px; padding: 0 9px; font-size: 13px; gap: 5px; }
+  .race-toggles .seg-dot { display: none; }
+  .card-toggles .seg-dot { width: 6px; height: 6px; }
+}
+@media (max-width: 359px) {
+  .card-toggles, .race-toggles { flex-wrap: wrap; }
 }

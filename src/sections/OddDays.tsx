@@ -62,7 +62,7 @@ export function OddDays() {
           const name = t.dayName(k, d.label[LANG]);
           return (
             <article key={k} className="card odd-card">
-              <header>
+              <header className="odd-head">
                 <h3 className="card-title">{name}</h3>
                 {d.date && <p className="card-note">{formatDate(d.date, LANG)}</p>}
               </header>
@@ -76,8 +76,8 @@ export function OddDays() {
                 <span><i className="odd-key-base" />{t.odd.typical}</span>
               </p>
               <p className="odd-story">{t.odd.stories[k]}</p>
-              <p className="card-note">{t.odd.total(signedPercent(total, LANG), t.dayVs(c))}</p>
-              <button className="chip-btn ghost" onClick={() => open(k)}>{t.odd.show}</button>
+              <p className="card-note odd-total">{t.odd.total(signedPercent(total, LANG), t.dayVs(c))}</p>
+              <button className="chip-btn ghost odd-btn" onClick={() => open(k)}>{t.odd.show}</button>
             </article>
           );
         })}

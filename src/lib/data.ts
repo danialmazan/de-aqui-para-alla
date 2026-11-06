@@ -60,14 +60,17 @@ export type PlaceDay = {
   hours: { out: Hours; in: Hours; within: Hours };
   out: PlaceWayFull | PlaceWaySummary;
   in: PlaceWayFull | PlaceWaySummary;
-  bands?: { dentro: number[]; fuera: number[] };
+  /** Distance bands: trips inside the place, leaving it (`fuera`) and arriving from elsewhere (`llegan`). */
+  bands?: { dentro: number[]; fuera: number[]; llegan?: number[] };
   purpose?: { out: number[]; in: number[] };
 };
 
 export type Place = { id: string; keys: Record<string, PlaceDay> };
 
 /** La carrera: per day key, every place that reaches an hour's top `top`, with 24-hour arrivals. */
-export type Race = { top: number; min_pop: number; keys: Record<string, { zone: number[]; h: number[][] }> };
+export type RaceSide = { zone: number[]; h: number[][] };
+/** La carrera: per day key, arrivals by destination (`in`) and departures by origin (`out`). */
+export type Race = { top: number; min_pop: number; keys: Record<string, { in: RaceSide; out: RaceSide }> };
 
 export const isFull = (w: PlaceWayFull | PlaceWaySummary): w is PlaceWayFull => 'h' in w;
 

@@ -87,9 +87,12 @@ export function PlaceRow({ zones, zone, way, onWay, onClose }: {
 }) {
   return (
     <div className="place-row">
-      <strong className="pr-name">{placeName(zones, zone)}</strong>
+      <button type="button" className="pr-chip" onClick={onClose} aria-label={`${placeName(zones, zone)}. ${t.place.closeLabel}`}
+        title={t.place.closeLabel}>
+        <strong className="pr-name">{placeName(zones, zone)}</strong>
+        <Icon name="close" />
+      </button>
       <WaySwitch way={way} onWay={onWay} />
-      <CloseButton onClose={onClose} />
     </div>
   );
 }
@@ -136,9 +139,13 @@ export function PlaceCard({ zones, zone, day, way, onWay, onClose, special, comp
         <div><dt><i style={{ background: 'var(--alla)' }} />{t.place.arrive}</dt><dd className="num">≈ {approxShort(inn, LANG)}</dd></div>
         <div><dt><i style={{ background: 'var(--dentro)' }} />{t.place.stay}</dt><dd className="num">≈ {approxShort(within, LANG)}</dd></div>
       </dl>
-      {!compact && <p className="pc-note">{t.place.perDay} {t.place.tenths(tenths)}</p>}
-      {!compact && <WaySwitch way={way} onWay={onWay} />}
-      <p className="eyebrow pc-top-title">{way === 'salen' ? t.place.whereTo : t.place.whereFrom}</p>
+      {!compact && (
+        <p className="pc-note">{t.place.perDay[0]}<strong className="pc-unit">{t.place.perDay[1]}</strong>{t.place.perDay[2]} {t.place.tenths(tenths)}</p>
+      )}
+      <div className="pc-top-head">
+        <p className="eyebrow pc-top-title">{way === 'salen' ? t.place.whereTo : t.place.whereFrom}</p>
+        {!compact && <WaySwitch way={way} onWay={onWay} />}
+      </div>
       <ol className="bars">
         {top.map((x) => (
           <li key={x.z}>

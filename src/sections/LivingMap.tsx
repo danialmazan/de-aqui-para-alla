@@ -17,6 +17,7 @@ import { Dock } from '../components/Dock.tsx';
 import { Icon } from '../components/Controls.tsx';
 import { PlaceCard, PlaceRow, isForeign, placeName } from '../components/PlaceCard.tsx';
 import { Search } from '../components/Search.tsx';
+import { ResetButton } from '../components/DayTools.tsx';
 import { Wordmark } from '../components/Wordmark.tsx';
 
 const BASE = import.meta.env.BASE_URL;
@@ -391,8 +392,11 @@ export function LivingMap() {
     const cam = map && (to === 'spain' ? map.cameraForBounds(SPAIN_BOUNDS, { padding: viewPadding() }) : madridCamera(map));
     if (cam) map.flyTo({ ...cam, duration: REDUCED ? 0 : 1200 });
   };
-  // Closing a place keeps the camera where it is.
+  // Closing a place keeps the camera where it is; the reset button also flies
+  // back to the opening view.
   const closePlace = () => setView({ place: null });
+  const resetMap = () => { setView({ place: null }); fly('madrid'); };
+  const resetBtn = <ResetButton className="map-reset" label={t.hero.reset} active onReset={resetMap} />;
   const onWay = (w: Way) => setView({ way: w });
   const placeDay = place?.keys[key];
   const special = day?.kind === 'special';
@@ -412,18 +416,25 @@ export function LivingMap() {
 
       <header className="hero-head">
         <h1 className="hero-title"><Wordmark layout="inline" className="hero-wordmark" /></h1>
-        {day && (
+        {day && !showCard && (
           <p className="hero-note">
             {(() => { const [a, b] = t.hero.day(key, day.label[LANG], day.n ?? 0); return <><strong>{a}</strong>{b}</>; })()}
           </p>
         )}
-        {zones && <Search zones={zones} onPick={(z) => setView({ place: z })} />}
-        {showCard ? (
+        <div className="search-row">
+          {zones && <Search zones={zones} onPick={(z) => setView({ place: z })} />}
+          {phone && resetBtn}
+        </div>
+        {(!phone || placeZone === null) && (
+          <div className="view-row">
+            <button className="chip-btn view-btn" onClick={() => fly(zoomedOut ? 'madrid' : 'spain')}>
+              {zoomedOut ? t.hero.toMadrid : t.hero.toSpain}
+            </button>
+            {!phone && resetBtn}
+          </div>
+        )}
+        {showCard && (
           <PlaceCard zones={zones} zone={placeZone} day={placeDay} way={way} onWay={onWay} onClose={closePlace} special={special} />
-        ) : placeZone === null && (
-          <button className="chip-btn view-btn" onClick={() => fly(zoomedOut ? 'madrid' : 'spain')}>
-            {zoomedOut ? t.hero.toMadrid : t.hero.toSpain}
-          </button>
         )}
       </header>
 

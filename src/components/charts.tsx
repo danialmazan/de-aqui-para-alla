@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LANG } from '../lib/copy.ts';
 import { approx, approxShort, formatHour, percent } from '../lib/format.ts';
-import { useAnimatedNumber, useClockHour, useWholeHour } from '../lib/hooks.ts';
+import { useAnimatedNumber, useClockHour, useMedia, useWholeHour } from '../lib/hooks.ts';
 import { FitName } from './PlaceCard.tsx';
 
 export function CountUp({ value, short = false }: { value: number; short?: boolean }) {
@@ -76,7 +76,9 @@ export function Heartbeat({ out, inn, cmp, labels }: {
 }) {
   const W = 600;
   const H = 180;
-  const P = { l: 44, r: 8, t: 10, b: 24 };
+  // Phones draw the axis labels larger (in chart units), so they need more room.
+  const phone = useMedia('(max-width: 767px)');
+  const P = { l: phone ? 88 : 48, r: 8, t: 10, b: 24 };
   const max = Math.max(1, ...out, ...inn, ...(cmp ? [...cmp.out, ...cmp.inn] : []));
   const step = (W - P.l - P.r) / 24;
   const x = (h: number) => P.l + (h + 0.5) * step;
@@ -168,16 +170,18 @@ export function Heartbeat({ out, inn, cmp, labels }: {
 }
 
 /** Distance bands: trips starting here that stay inside vs go elsewhere. */
-export function Bands({ dentro, fuera, names, inside, outside }: {
+export function Bands({ dentro, fuera, names, inside, outside, tone = 'aqui' }: {
   dentro: number[]; fuera: number[]; names: string[]; inside: string; outside: string;
+  /** Leaving (amber) or arriving from elsewhere (aqua). */
+  tone?: 'aqui' | 'alla';
 }) {
   const total = Math.max(1, dentro.reduce((a, b) => a + b, 0) + fuera.reduce((a, b) => a + b, 0));
   const max = Math.max(1, ...dentro.map((d, i) => d + fuera[i]));
   return (
-    <div className="bands">
+    <div className="bands" data-tone={tone}>
       <p className="bands-key">
         <span><i style={{ background: 'var(--dentro)' }} />{inside}</span>
-        <span><i style={{ background: 'var(--aqui)' }} />{outside}</span>
+        <span><i style={{ background: `var(--${tone})` }} />{outside}</span>
       </p>
       <ul>
         {names.map((n, i) => (
