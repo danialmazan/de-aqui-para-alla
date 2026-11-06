@@ -14,8 +14,9 @@ test-results/
 playwright-report/
 data/geo/
 
-# Generated data release (reproducible: npm run data:publish)
-public/data/
+# The data release (public/data/<release>/) is committed so the Pages build
+# can run without the local rollup; only the publish script's scratch folder is ignored.
+public/data/_staging/
 
 # Review screenshots (regenerate with tools/capture-review*.mjs)
 docs/review*/

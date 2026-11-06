@@ -276,6 +276,8 @@ export function LivingMap() {
     applyLook(layer, window.matchMedia('(max-width: 767px)').matches);
     layer.onStats = setStats;
     mapRef.current = map;
+    // Dev only: lets tools/make-social.mjs frame the sharing preview.
+    if (import.meta.env.DEV) Object.assign(window, { __map: map, __spain: SPAIN_BOUNDS });
     layerRef.current = layer;
     map.on('load', () => {
       // The zoning credit starts folded into its ⓘ so it never sits under the panels.

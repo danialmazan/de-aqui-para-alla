@@ -8,8 +8,19 @@ records, «Basado en datos abiertos MITMA»). It shows typical days (normal
 weekday, Saturday, Sunday, summer) averaged over clean days of Jul 2024 – Feb 2025,
 plus four special days. See `docs/DECISIONS.md`.
 
-Status: **Stage 3 (MVP: living map, Tu lugar, methods; Spanish and English)**.
-Local development only; nothing is published.
+Live at https://danielalmazan.com/de-aqui-para-alla/ (English: `/en/`).
+
+## Publish
+
+Pushing to `main` runs `.github/workflows/pages.yml`: type-check, unit tests,
+build, then deploy to GitHub Pages. The committed data release in
+`public/data/` is what ships; rebuild it with `npm run data:publish` (needs the
+local rollup) and commit the new `public/data/<release>/` folder.
+
+Sharing previews: `/` and `/en/` each carry their own title, description and
+1200×630 image (`public/social-es-v1.jpg`, `public/social-en-v1.jpg`, made by
+`node tools/make-social.mjs` against the dev server). Bump the `-v1` suffix
+when the image changes, so WhatsApp and others fetch the new one.
 
 ## Run
 
