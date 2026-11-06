@@ -85,3 +85,10 @@ The map opens on the Madrid area at municipal detail rather than the full penins
 - **02 and 03 side by side** from 1,100 px wide, with Días raros' four cards stacked (text left, chart right). Below that width they stay one after the other.
 - **Place card on the map** fits its top 5 without scrolling down to 760 px tall: the day line above the search hides while a place card shows (the dock still names the day), and the Salen/Llegan switch shares a row with its heading.
 
+## Publication (6 Nov 2026)
+
+- **Hosting:** its own public repository, `danialmazan/de-aqui-para-alla`, deployed by GitHub Actions to Pages at https://danielalmazan.com/de-aqui-para-alla/ (the user site's custom domain covers project sites). Not copied into `danialmazan.github.io`, which would grow by the data release each time.
+- **Data in git:** `public/data/<release>/` (about 145 MB, 3,100 files) is committed, because CI can't rebuild it without the local rollup. A new release adds its own folder and removes the old one.
+- **Sharing previews:** `/` and `/en/` are separate static entries with their own title, description and 1200×630 JPEG, so a link copied from either language previews in that language. The language button keeps the view in the URL when switching.
+- **Portfolio:** first card in Density and transport analysis, on the homepage and the section page (catalogue in `codex/Web`).
+
