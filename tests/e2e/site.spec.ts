@@ -36,7 +36,7 @@ test('a shared link restores place, direction and day', async ({ page }) => {
   await ready(page);
   await expect(page.locator('#tu-lugar h2')).toContainText('Barcelona');
   await expect(page.locator('#tu-lugar').getByRole('button', { name: 'Llegan' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.hero-note')).toContainText('sábado normal');
+  await expect(page.locator('.hero-note')).toContainText('Sábado normal');
 });
 
 test('reduced motion: nothing autoplays', async ({ browser }) => {
@@ -74,4 +74,39 @@ test('a data failure shows a retry', async ({ page }) => {
   await page.goto('./');
   await expect(page.getByRole('alert').first()).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole('button', { name: 'Reintentar' })).toBeVisible();
+});
+
+test('the explanation opens on request; the time panel minimises and restores', async ({ page }, info) => {
+  await page.goto('./');
+  await ready(page);
+  const body = page.locator('#methods-body');
+  await expect(body).toBeHidden();
+  await page.getByRole('button', { name: 'Mostrar la explicación' }).click();
+  await expect(body).toBeVisible();
+  if (info.project.name === 'desktop') {
+    await expect(page.locator('.dock .unit')).toBeVisible();
+    await page.getByRole('button', { name: 'Minimizar panel' }).click();
+    await expect(page.locator('.dock .unit')).toBeHidden();
+    await expect(page.locator('.dock select')).toBeVisible();
+    await page.getByRole('button', { name: 'Ampliar panel' }).click();
+    await expect(page.locator('.dock .unit')).toBeVisible();
+  }
+});
+
+test('compare a day, the race and the odd days', async ({ page }) => {
+  await page.goto('./');
+  await ready(page);
+  await page.locator('.cmp-pick select').selectOption('sabado');
+  await expect(page.locator('.cmp-delta')).toContainText('Frente a un sábado normal');
+  await page.locator('#carrera').scrollIntoViewIfNeeded();
+  await expect(page.locator('#carrera .ranking li')).toHaveCount(10);
+  await page.locator('#carrera').getByRole('button', { name: 'En total' }).click();
+  await page.locator('.race-hour').fill('8');
+  await expect(page.locator('#carrera .ranking li[aria-posinset="1"] .rk-name')).toHaveText('Madrid');
+  await expect(page.locator('.odd-card')).toHaveCount(4);
+  const axe = await new AxeBuilder({ page }).include('#carrera').include('#dias-raros').include('.tl-heartbeat').analyze();
+  const serious = axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' ')}`)).toEqual([]);
+  await page.locator('.odd-card').filter({ hasText: 'Año Nuevo' }).getByRole('button').click();
+  await expect(page).toHaveURL(/dia=ano-nuevo/);
 });

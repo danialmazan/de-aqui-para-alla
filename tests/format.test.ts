@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { approx, approxShort, formatHour, percent } from '../src/lib/format.ts';
+import { approx, approxShort, formatHour, percent, signedPercent } from '../src/lib/format.ts';
 
 describe('format', () => {
   it('rounds to two significant figures with local grouping', () => {
@@ -18,8 +18,11 @@ describe('format', () => {
     expect(approxShort(940_000, 'es')).toBe('940.000');
   });
   it('formats percentages per language', () => {
-    expect(percent(0.584, 'es')).toBe('58 %');
+    expect(percent(0.584, 'es')).toBe('58\u00a0%'); // no line break before the sign
     expect(percent(0.584, 'en')).toBe('58%');
+    expect(signedPercent(0.874, 'es')).toBe('+87\u00a0%');
+    expect(signedPercent(-0.48, 'en')).toBe('−48%');
+    expect(signedPercent(0.001, 'en')).toBe('0%');
   });
   it('formats hours on a 24-hour clock', () => {
     expect(formatHour(8.7)).toBe('08:00');

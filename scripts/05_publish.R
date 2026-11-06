@@ -7,6 +7,8 @@
 #   places/<zone>.json       one place, every day key: partners both ways, hourly totals,
 #                            distance bands and purpose (typical days); a short summary for special days
 #   search.json              every INE municipality name -> its zone
+#   race.json                La carrera: per key, every place in an hour's top 12 (total or
+#                            per resident), with its 24-hour arrivals from other Spanish places
 #
 # Values are average trips starting in each hour on the typical day (or on the
 # special day itself). Which arcs are *drawn* is decided on screen (docs/DECISIONS.md);
@@ -20,7 +22,7 @@ suppressPackageStartupMessages({
 })
 source("scripts/lib_stream.R")
 
-IN <- "data/interim/days"
+IN <- "data/rollup"
 RAW <- "data/raw/zonificacion"
 OUT_ROOT <- "public/data"
 NEAR_KM <- 30                         # national: closer áreas fold into the origin's halo
@@ -31,6 +33,8 @@ PLACE_STATIC <- 300                   # further partners drawn as faint lines (d
 SPECIAL_TOP <- 10                     # special days: top partners each way, daily totals only
 PURPOSES <- c("trabajo", "casa", "frecuente", "ocasional")
 MIN_DAILY <- 5                        # connections under 5 trips/day are never shipped
+RACE_TOP <- 12                        # La carrera: places shipped per hour and ranking
+RACE_MIN_POP <- 20000                 # "per resident" ranking: towns this size and up
 H <- sprintf("h%d", 0:23)
 
 cal <- fromJSON(Sys.getenv("CALENDAR", "data/calendar.json"), simplifyVector = FALSE)
@@ -99,23 +103,28 @@ hav_sql <- "2 * 6371 * asin(sqrt(pow(sin(radians(b.lat - a.lat) / 2), 2) +
 
 # Average over the key's days (sum / number of days). Exact decimal sums keep the
 # release byte-identical between runs, whatever order DuckDB's threads add in.
-load_key <- function(days) {
-  files <- sprintf("'%s/day=%s/od_hour.parquet'", IN, gsub("-", "", days))
-  stopifnot(all(file.exists(gsub("'", "", files))))
+# The rollup holds exact per-key sums (scripts/03_rollup.R).
+rollup <- fromJSON(file.path(IN, "keys.json"))
+rollup_file <- function(k, what, days) {
+  stopifnot(identical(rollup[[k]]$days, unlist(days)))   # calendar and rollup agree
+  f <- file.path(IN, k, paste0(what, ".parquet"))
+  stopifnot(file.exists(f))
+  f
+}
+load_key <- function(k, days) {
   dbExecute(con, sprintf("CREATE OR REPLACE TABLE od AS
-    SELECT o, d, h, CAST(sum(CAST(trips AS DECIMAL(18, 3))) / %d AS DECIMAL(18, 4)) AS t
-    FROM read_parquet([%s]) GROUP BY ALL",
-    length(days), paste(files, collapse = ",")))
+    SELECT o, d, h, CAST(sum(trips) / %d AS DECIMAL(18, 4)) AS t
+    FROM read_parquet('%s') GROUP BY ALL",
+    length(days), rollup_file(k, "od_hour", days)))
 }
 
 # Hourly values: one decimal below 10 trips, whole trips above (keeps files small).
 # Daily distance band × destination activity, averaged over the key's days.
-load_band_purpose <- function(days) {
-  files <- sprintf("'%s/day=%s/od_band_purpose.parquet'", IN, gsub("-", "", days))
+load_band_purpose <- function(k, days) {
   dbExecute(con, sprintf("CREATE OR REPLACE TABLE bp AS
-    SELECT o, d, band, purpose, CAST(sum(CAST(trips AS DECIMAL(18, 3))) / %d AS DECIMAL(18, 4)) AS t
-    FROM read_parquet([%s]) GROUP BY ALL",
-    length(days), paste(files, collapse = ",")))
+    SELECT o, d, band, purpose, CAST(sum(trips) / %d AS DECIMAL(18, 4)) AS t
+    FROM read_parquet('%s') GROUP BY ALL",
+    length(days), rollup_file(k, "od_band_purpose", days)))
 }
 
 hmat <- function(dt) {
@@ -220,6 +229,18 @@ publish_key <- function(key, out) {
   }
   place_parts[[key]] <<- list(special = special, ranked = ranked, hourly = hourly, extra = extra)
 
+  # --- La carrera: arrivals from other Spanish places, by hour ----------------------------
+  arr <- fill0(q(sprintf("
+    SELECT od.d AS z, %s FROM od JOIN zones zo ON zo.id = od.o JOIN zones zd ON zd.id = od.d
+    WHERE od.o <> od.d AND regexp_matches(zo.prov, '^[0-9]+$') AND regexp_matches(zd.prov, '^[0-9]+$')
+    GROUP BY od.d ORDER BY od.d", hours_sql)))
+  m <- as.matrix(arr[, ..H])
+  popv <- zones$pop[match(arr$z, zones$id)]
+  pc <- m / ifelse(!is.na(popv) & popv >= RACE_MIN_POP, popv, NA)
+  topn <- function(x) { x[is.na(x)] <- -Inf; head(order(-x, arr$z), RACE_TOP) }
+  keep <- sort(unique(unlist(lapply(seq_along(H), function(j) c(topn(m[, j]), topn(pc[, j]))))))
+  race_parts[[key]] <<- list(zone = I(zones$idx[match(arr$z[keep], zones$id)]), h = hmat(arr[keep]))
+
   list(
     trips = round(totals$all_trips),
     within_zone_share = round(totals$within_zone / totals$all_trips, 4),
@@ -237,18 +258,19 @@ dir.create(stage, recursive = TRUE)
 
 keys <- list()
 place_parts <- list()
+race_parts <- list()
 for (k in names(cal$typical)) {
   t <- cal$typical[[k]]
   message("typical ", k, " (", t$n, " days)")
-  load_key(unlist(t$days))
-  load_band_purpose(unlist(t$days))
+  load_key(k, unlist(t$days))
+  load_band_purpose(k, unlist(t$days))
   keys[[k]] <- list(kind = "typical", label = t$label, note = t$note, days = unlist(t$days), n = t$n,
                     totals = publish_key(k, stage))
 }
 for (k in names(cal$special)) {
   s <- cal$special[[k]]
   message("special ", k, " (", s$date, ")")
-  load_key(s$date)
+  load_key(k, s$date)
   keys[[k]] <- list(kind = "special", label = s$label, date = s$date, compare = s$compare,
                     totals = publish_key(k, stage))
 }
@@ -258,6 +280,7 @@ write_obj(list(
                prov = zones$prov, area = zones$area_idx, pop = round(zones$pop)),
   areas = list(id = areas$id, name = areas$name, lon = round(areas$x, 4), lat = round(areas$y, 4))
 ), file.path(stage, "zones.json"))
+write_obj(list(top = RACE_TOP, min_pop = RACE_MIN_POP, keys = race_parts), file.path(stage, "race.json"))
 
 # --- One file per place, holding every day key -----------------------------------------
 message("places")

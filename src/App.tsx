@@ -1,4 +1,4 @@
-// The page: the living map, then Tu lugar, then how to read the data.
+// The page: the living map, Tu lugar, La carrera, Días raros, then how to read the data.
 // Shared state (place, direction, day) lives in lib/state.ts and the URL.
 
 import { useEffect } from 'react';
@@ -9,6 +9,8 @@ import { REDUCED } from './lib/hooks.ts';
 import { loadData, useData } from './lib/state.ts';
 import { LivingMap } from './sections/LivingMap.tsx';
 import { Footer, Methods } from './sections/Methods.tsx';
+import { OddDays } from './sections/OddDays.tsx';
+import { Race } from './sections/Race.tsx';
 import { TuLugar } from './sections/TuLugar.tsx';
 
 export function App() {
@@ -36,6 +38,8 @@ export function App() {
           </p>
         )}
         <TuLugar />
+        <Race />
+        <OddDays />
         <Methods />
       </main>
       <Footer />

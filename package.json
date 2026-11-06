@@ -13,6 +13,7 @@
     "data:sources": "Rscript scripts/00_sources.R",
     "data:calendar": "Rscript scripts/01_calendar.R",
     "data:stream": "Rscript scripts/02_stream_days.R",
+    "data:rollup": "Rscript scripts/03_rollup.R",
     "data:publish": "Rscript scripts/05_publish.R",
     "data:validate": "Rscript scripts/07_validate.R",
     "data:spike": "Rscript scripts/spike_stream_day.R",

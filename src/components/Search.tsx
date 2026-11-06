@@ -45,6 +45,7 @@ export function Search({ zones, onPick }: { zones: Zones; onPick: (zone: number)
         <span className="sr-only">{t.search.label}</span>
         <input
           ref={input}
+          id="buscar"
           type="search"
           placeholder={t.search.label}
           autoComplete="off"

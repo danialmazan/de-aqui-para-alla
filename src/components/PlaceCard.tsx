@@ -1,8 +1,8 @@
 // The selected place on the map: daily totals, top partners for the chosen
-// direction, the Salen/Llegan switch and the way back to Spain. Grouped zones
-// list their members. `PlaceRow` is the phone sheet's one-line version.
+// direction, the Salen/Llegan switch and an X back to Spain. Grouped zones list
+// their members. `PlaceRow` is the phone sheet's one-line version.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { LANG, t } from '../lib/copy.ts';
 import { isFull, loadSearch, type PlaceDay, type Zones } from '../lib/data.ts';
 import { approx, approxShort } from '../lib/format.ts';
@@ -15,12 +15,56 @@ export function placeName(zones: Zones, zone: number) {
   return zones.zones.name[zone].replace(' (agrupación)', '');
 }
 
-export function topPartners(day: PlaceDay, way: Way, n: number, hour: number | null = null) {
+/** France and Portugal: located in the data, but the rest of the world isn't, so none are shown. */
+export function isForeign(zones: Zones, zone: number) {
+  return !/^\d/.test(zones.zones.prov[zone]);
+}
+
+/** Biggest partners within Spain, for the day or (typical days) one hour. */
+export function topPartners(zones: Zones, day: PlaceDay, way: Way, n: number, hour: number | null = null) {
   const w = way === 'salen' ? day.out : day.in;
   const list = isFull(w)
     ? w.z.map((z, i) => ({ z, v: hour === null ? sum(w.h[i]) : w.h[i][hour] }))
     : w.z.map((z, i) => ({ z, v: w.day[i] }));
-  return list.sort((a, b) => b.v - a.v).slice(0, n);
+  return list.filter((x) => !isForeign(zones, x.z)).sort((a, b) => b.v - a.v).slice(0, n);
+}
+
+/**
+ * A place name in a narrow column. When it doesn't fit it can be swiped
+ * sideways, and hovering, focusing or tapping it shows the whole name.
+ */
+export function FitName({ text, className = '' }: { text: string; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [cut, setCut] = useState(false);
+  const [tip, setTip] = useState(false);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setCut(el.scrollWidth > el.clientWidth + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [text]);
+
+  useEffect(() => {
+    if (!tip) return;
+    const close = (e: PointerEvent) => { if (!ref.current?.parentElement?.contains(e.target as Node)) setTip(false); };
+    document.addEventListener('pointerdown', close);
+    return () => document.removeEventListener('pointerdown', close);
+  }, [tip]);
+
+  return (
+    <span className={`fit-name ${className}`} data-cut={cut}
+      onMouseEnter={() => cut && setTip(true)} onMouseLeave={() => setTip(false)}
+      onClick={() => cut && setTip((v) => !v)}>
+      <span ref={ref} className="fit-scroll" tabIndex={cut ? 0 : undefined}
+        onFocus={() => cut && setTip(true)} onBlur={() => setTip(false)}
+        title={cut ? text : undefined}>{text}</span>
+      {cut && tip && <span className="fit-tip" role="tooltip">{text}</span>}
+    </span>
+  );
 }
 
 function WaySwitch({ way, onWay }: { way: Way; onWay: (w: Way) => void }) {
@@ -32,8 +76,8 @@ function WaySwitch({ way, onWay }: { way: Way; onWay: (w: Way) => void }) {
 
 function CloseButton({ onClose }: { onClose: () => void }) {
   return (
-    <button className="chip-btn ghost pc-close" onClick={onClose} aria-label={t.place.closeLabel}>
-      <Icon name="close" /> {t.place.close}
+    <button className="icon-btn pc-close" onClick={onClose} aria-label={t.place.closeLabel} title={t.place.closeLabel}>
+      <Icon name="close" />
     </button>
   );
 }
@@ -66,7 +110,7 @@ export function PlaceCard({ zones, zone, day, way, onWay, onClose, special, comp
   const out = sum(day.hours.out);
   const inn = sum(day.hours.in);
   const within = sum(day.hours.within);
-  const top = topPartners(day, way, compact ? 3 : 5);
+  const top = topPartners(zones, day, way, 5);
   const max = Math.max(1, ...top.map((x) => x.v));
   const tenths = out + within > 0 ? Math.round((within / (out + within)) * 10) : 0;
 
@@ -98,7 +142,7 @@ export function PlaceCard({ zones, zone, day, way, onWay, onClose, special, comp
       <ol className="bars">
         {top.map((x) => (
           <li key={x.z}>
-            <span className="bar-name">{zones.zones.name[x.z]}</span>
+            <FitName className="bar-name" text={zones.zones.name[x.z]} />
             <span className="bar-track"><span className="bar-fill" style={{ width: `${(x.v / max) * 100}%` }} /></span>
             <span className="num bar-val">{approx(x.v, LANG)}</span>
           </li>

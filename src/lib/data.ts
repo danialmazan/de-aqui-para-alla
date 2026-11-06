@@ -66,6 +66,9 @@ export type PlaceDay = {
 
 export type Place = { id: string; keys: Record<string, PlaceDay> };
 
+/** La carrera: per day key, every place that reaches an hour's top `top`, with 24-hour arrivals. */
+export type Race = { top: number; min_pop: number; keys: Record<string, { zone: number[]; h: number[][] }> };
+
 export const isFull = (w: PlaceWayFull | PlaceWaySummary): w is PlaceWayFull => 'h' in w;
 
 let root: Promise<string> | null = null;
@@ -98,3 +101,4 @@ export const loadNational = (key: string) => load<National>(`national/${key}.jso
 export const loadRegional = (prov: string, key: string) => load<Regional>(`regional/${prov}-${key}.json`);
 export const loadPlace = (id: string) => load<Place>(`places/${id}.json`);
 export const loadSearch = () => load<SearchIndex>('search.json');
+export const loadRace = () => load<Race>('race.json');

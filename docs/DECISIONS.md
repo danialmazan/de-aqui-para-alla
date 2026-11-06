@@ -58,10 +58,19 @@ The map opens on the Madrid area at municipal detail rather than the full penins
 ## Scope and data sizes (4 Nov 2026)
 
 - **No month-by-month data.** "El año" as a map section is dropped, and so is the "Meses" mode of La carrera. No further days are streamed beyond the 71 in `data/calendar.json`.
-- **Streamed days are kept** in `data/interim/days/` (2.6 GB), not rolled up.
+- **Streamed days are rolled up** (6 Nov 2026) by `scripts/03_rollup.R` into exact per-key sums in `data/rollup/` (194 MB), and the 71 daily folders (2.6 GB) were deleted. Republishing from the rollup gave the identical release (73b7b841ca). A new day key needs its days streamed again (1–2 min each).
 - **Place files:** one per place (`places/<zone>.json`, 2,618 files, about 107 MB raw and 13.5 KB gzipped on average). Each holds all day keys:
   - typical days: the top 40 partners each way with 24-hour values, up to 300 more as daily totals, the rest as one number, plus hourly out/in/within, distance bands and purpose;
   - special days: the top 10 partners each way with daily totals, plus hourly out/in/within.
 - **Map filters by distance or purpose are not built.** Distance and purpose appear only as Tu lugar charts, from the place files.
 - **Search** covers all 8,132 INE municipalities (2025 dictionary), plus a few older or Castilian names.
 - **Validation:** `scripts/07_validate.R` must pass before a release is used. Its report is `reports/VALIDATION.md`.
+
+## La carrera, Días raros and day comparison (6 Nov 2026)
+
+- **La carrera** (section 02) ranks places by trips arriving from other Spanish municipalities in each hour, on the chosen day key. It follows the shared clock and day. Two measures:
+  - **Por vecino** (default): arrivals per 1,000 residents, in municipalities over 20,000 people. Counted raw, Madrid and Barcelona lead every hour; per resident, business parks, campuses, airports and beaches stand out.
+  - **En total**: raw arrivals.
+  - Data: `race.json` (35 KB gz, loaded when the section nears the screen). It holds every place in any hour's top 12 by either measure, with 24-hour arrivals. Built in `05_publish.R`.
+- **Días raros** (section 03): the four special days as small multiples of national trips per hour, each against its manifest `compare` day. The hour with the largest relative change is marked. Each card's one-line story is hand-written and was checked against those hourly changes.
+- **Comparar con** in Tu lugar's pulse chart: draws any other day key for the same place, dashed on the same scale. It reports the change in daily departures and arrivals. Special days start compared with their typical day.

@@ -16,3 +16,6 @@ data/geo/
 
 # Generated data release (reproducible: npm run data:publish)
 public/data/
+
+# Review screenshots (regenerate with tools/capture-review*.mjs)
+docs/review*/

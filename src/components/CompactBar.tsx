@@ -1,4 +1,4 @@
-// Once the map scrolls away, a slim bar keeps the name, the sections, the current
+// Once the title scrolls out of sight, a slim bar keeps the name, the current
 // place and the language switch at hand (family pattern: IntersectionObserver).
 
 import { useEffect, useState } from 'react';
@@ -14,33 +14,38 @@ export function languageHref() {
   return `${LANG === 'es' ? `${BASE}en/` : BASE}${location.search}${location.hash}`;
 }
 
+/** Back to the map with the search box ready to type in. */
+export function findPlace() {
+  document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => document.getElementById('buscar')?.focus({ preventScroll: true }), 450);
+}
+
 export function CompactBar() {
   const [shown, setShown] = useState(false);
   const { zones } = useData();
   const { place } = useView();
 
   useEffect(() => {
-    const hero = document.getElementById('mapa');
-    if (!hero) return;
-    const io = new IntersectionObserver(([e]) => setShown(e.intersectionRatio < 0.15), { threshold: [0, 0.15, 0.5] });
-    io.observe(hero);
+    const title = document.querySelector('.hero-title');
+    if (!title) return;
+    const io = new IntersectionObserver(([e]) => setShown(!e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(title);
     return () => io.disconnect();
   }, []);
 
   return (
-    <nav className="compact-bar" data-shown={shown} aria-label={t.nav.map} aria-hidden={!shown} inert={!shown}>
+    <nav className="compact-bar" data-shown={shown} aria-label={t.nav.bar} aria-hidden={!shown} inert={!shown}>
       <a className="cb-home" href="#mapa">
         <Mark size={24} tile={false} />
         <span className="cb-name">{t.title.a} <em>{t.title.b}</em></span>
       </a>
-      <span className="cb-links">
-        <a href="#mapa">{t.nav.map}</a>
-        <a href="#tu-lugar">{t.nav.place}</a>
-        <a href="#como-leer">{t.nav.methods}</a>
-      </span>
-      {zones && place !== null && (
+      {zones && place !== null ? (
         <button className="place-pill" onClick={() => setView({ place: null })}>
-          {placeName(zones, place)} <Icon name="close" /><span className="sr-only"> · {t.place.closeLabel}</span>
+          <span className="pp-name">{placeName(zones, place)}</span> <Icon name="close" /><span className="sr-only"> · {t.place.closeLabel}</span>
+        </button>
+      ) : (
+        <button className="place-pill find-pill" onClick={findPlace}>
+          <Icon name="search" /> {t.nav.find}
         </button>
       )}
       <a className="cb-lang" href={languageHref()} hrefLang={LANG === 'es' ? 'en' : 'es'} lang={LANG === 'es' ? 'en' : 'es'}>

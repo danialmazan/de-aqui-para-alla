@@ -28,6 +28,7 @@ https://movilidad-opendata.mitma.es — raw daily OD files are never stored.
     npm run data:calendar   # typical and special days -> data/calendar.json
     npm run data:stream     # stream those days into data/interim/days/ (resumable; shard with: Rscript scripts/02_stream_days.R <i> <n>)
     Rscript --vanilla scripts/04_geo.R   # basemap PMTiles (needs tippecanoe)
+    npm run data:rollup     # exact per-key sums in data/rollup/; the daily folders can then be deleted
     npm run data:publish    # public/data/<release>/ (content-hashed, reproducible)
     npm run data:validate   # reports/VALIDATION.md; fails on any check
 

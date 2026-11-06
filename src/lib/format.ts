@@ -27,7 +27,13 @@ export function approxShort(v: number, lang: Lang = 'es') {
 /** "58 %" in Spanish (RAE spacing), "58%" in English. */
 export function percent(share: number, lang: Lang = 'es') {
   const n = Math.round(share * 100).toLocaleString(locale(lang));
-  return lang === 'es' ? `${n} %` : `${n}%`;
+  return lang === 'es' ? `${n}\u00a0%` : `${n}%`; // no break before the sign
+}
+
+/** A change as "+18 %" / "−15 %" (true minus sign). */
+export function signedPercent(change: number, lang: Lang = 'es') {
+  const r = Math.round(change * 100);
+  return `${r > 0 ? '+' : r < 0 ? '−' : ''}${percent(Math.abs(r) / 100, lang)}`;
 }
 
 export function formatHour(h: number) {

@@ -6,7 +6,7 @@ export const SECONDS_PER_HOUR = 2.4;
 type Listener = () => void;
 
 class Clock {
-  hour = 8;
+  hour = 5; // the day starts before the morning rush, then loops through all 24 hours
   playing = true;
   private listeners = new Set<Listener>();
   private last = 0;

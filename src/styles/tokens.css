@@ -62,6 +62,7 @@ button, input, select { font: inherit; color: inherit; }
 input { font-size: max(16px, 1em); } /* no iOS zoom */
 
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+[data-input='pointer'] :focus-visible { outline: none; }
 
 .eyebrow {
   font-size: 11px;

@@ -1,33 +1,56 @@
-// The hero: the living map. Áreas below zoom 6.5, municipalities of the provinces
+// The hero: the living map. Áreas below zoom 7.5, municipalities of the provinces
 // in view above it, or one place and its partners when a place is selected.
 
 import { useEffect, useRef, useState } from 'react';
-import { Map as MlMap, addProtocol, setWorkerUrl, type LngLatBoundsLike } from 'maplibre-gl';
+import { Map as MlMap, NavigationControl, addProtocol, setWorkerUrl } from 'maplibre-gl';
 import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { Protocol } from 'pmtiles';
 import { basemapStyle } from '../map/basemap.ts';
 import { FlowLayer, type FlowArc, type FlowHalo, type FlowStats } from '../map/FlowLayer.ts';
 import { clock } from '../lib/clock.ts';
 import { LANG, t } from '../lib/copy.ts';
-import { isFull, loadNational, loadRegional, type Place, type Zones } from '../lib/data.ts';
-import { formatDate } from '../lib/format.ts';
+import { isFull, loadNational, loadRegional, type Place, type Regional, type Zones } from '../lib/data.ts';
 import { REDUCED, useMedia } from '../lib/hooks.ts';
 import { startPerfSampler, type PerfSnapshot } from '../lib/perf.ts';
 import { setView, useData, useView, type Way } from '../lib/state.ts';
 import { Dock } from '../components/Dock.tsx';
-import { PlaceCard, PlaceRow } from '../components/PlaceCard.tsx';
+import { Icon } from '../components/Controls.tsx';
+import { PlaceCard, PlaceRow, isForeign, placeName } from '../components/PlaceCard.tsx';
 import { Search } from '../components/Search.tsx';
 import { Wordmark } from '../components/Wordmark.tsx';
 
 const BASE = import.meta.env.BASE_URL;
 const params = new URLSearchParams(location.search);
-const DOT_BUDGET = Number(params.get('dots')) || 30000;
+/** Dot budget: fixed with ?dots=N, otherwise it follows the map's area (?density=dots per px²). */
+const DOT_BUDGET = Number(params.get('dots')) || 0;
+const DENSITY = Number(params.get('density')) || 0.008;
 const SHOW_PERF = params.has('perf');
-const CORE = Number(params.get('core') ?? 0.35);
-const GAIN = Number(params.get('gain') ?? 1.6);
+// Dot and halo brightness. Phones get brighter, slightly bigger dots: small,
+// often outdoor screens wash out the faint ones.
+type Look = { core: number; gain: number; radius: number; halo: number };
+const LOOK: Record<'desk' | 'phone', Look> = {
+  desk: { core: 0.35, gain: 1.6, radius: 4.2, halo: 1 },
+  phone: { core: 0.6, gain: 2.6, radius: 4.8, halo: 1.45 },
+};
+function lookFor(phone: boolean): Look {
+  const l = LOOK[phone ? 'phone' : 'desk'];
+  const n = (k: string, d: number) => (params.has(k) ? Number(params.get(k)) : d);
+  return { core: n('core', l.core), gain: n('gain', l.gain), radius: n('radius', l.radius), halo: n('halo', l.halo) };
+}
+function applyLook(layer: FlowLayer, phone: boolean) {
+  const l = lookFor(phone);
+  layer.coreOpacity = l.core;
+  layer.glowGain = l.gain;
+  layer.dotRadius = l.radius;
+  layer.haloGain = l.halo;
+}
 
-/** Below this zoom the map shows áreas; above it, municipalities of the provinces in view. */
-const AREA_MAX_ZOOM = 6.5;
+/**
+ * Below this zoom the map shows áreas; above it, municipalities of the provinces
+ * in view. Lower than this, thousands of short municipal links share the dots
+ * and most get none, so the map reads as halos only.
+ */
+const AREA_MAX_ZOOM = 7.5;
 const SPAIN_BOUNDS: [[number, number], [number, number]] = [[-13.4, 34.0], [4.4, 43.9]];
 const MADRID_BOUNDS: [[number, number], [number, number]] = [[-4.25, 40.05], [-3.15, 40.8]];
 const LABELS = 12;
@@ -41,9 +64,20 @@ function ensurePmtiles() {
 }
 
 const sum = (h: number[]) => h.reduce((a, b) => a + b, 0);
+const zero = () => new Array(24).fill(0);
 const isPhone = () => window.matchMedia('(max-width: 767px)').matches;
 
 /** Keep framed places clear of the title/search block, the left panel and the dock. */
+/**
+ * The opening view: Madrid and its ring of towns, a little wider than the
+ * metro area, but still close enough for the municipal flows (zoom ≥ 7.6).
+ */
+function madridCamera(map: MlMap) {
+  const cam = map.cameraForBounds(MADRID_BOUNDS, { padding: viewPadding() });
+  if (cam?.zoom !== undefined) cam.zoom = Math.max(AREA_MAX_ZOOM + 0.1, cam.zoom - 0.6);
+  return cam;
+}
+
 function viewPadding() {
   return isPhone()
     ? { top: 170, bottom: 230, left: 16, right: 16 }
@@ -63,16 +97,20 @@ type Scene = {
 async function nationalScene(key: string, z: Zones): Promise<Scene> {
   const nat = await loadNational(key);
   const pos = (i: number): [number, number] => [z.areas.lon[nat.nodes.area[i]], z.areas.lat[nat.nodes.area[i]]];
-  const halos = nat.nodes.area.map((_, i) => ({ at: pos(i), hours: nat.nodes.halo[i] }));
-  const day = nat.nodes.halo.map(sum);
-  const arcs = nat.arcs.o.map((o, i) => {
+  // Only trips within Spain (France and Portugal are the only places abroad the data locates).
+  const spain = nat.nodes.area.map((a) => !/^(FR|PT)/.test(z.areas.id[a]));
+  const halos = nat.nodes.area.map((_, i) => ({ at: pos(i), hours: spain[i] ? nat.nodes.halo[i] : zero() }));
+  const day = nat.nodes.halo.map((h, i) => (spain[i] ? sum(h) : 0));
+  const arcs: FlowArc[] = [];
+  nat.arcs.o.forEach((o, i) => {
     const d = nat.arcs.d[i];
+    if (!spain[o] || !spain[d]) return;
     const v = sum(nat.arcs.h[i]);
     day[o] += v;
     day[d] += v;
-    return { o: pos(o), d: pos(d), hours: nat.arcs.h[i], from: o };
+    arcs.push({ o: pos(o), d: pos(d), hours: nat.arcs.h[i], from: o });
   });
-  const places = nat.nodes.area.map((a, i) => ({ name: z.areas.name[a], lon: z.areas.lon[a], lat: z.areas.lat[a], day: day[i] }));
+  const places = nat.nodes.area.flatMap((a, i) => (spain[i] ? [{ name: z.areas.name[a], lon: z.areas.lon[a], lat: z.areas.lat[a], day: day[i] }] : []));
   return { level: 'area', arcs, halos, places };
 }
 
@@ -97,7 +135,7 @@ async function regionalScene(key: string, provs: string[], z: Zones): Promise<Sc
   files.forEach((f) => f.arcs.o.forEach((o, i) => {
     const d = f.arcs.d[i];
     const id = `${o}>${d}`;
-    if (seen.has(id)) return;
+    if (seen.has(id) || isForeign(z, o) || isForeign(z, d)) return;
     seen.add(id);
     const from = node(o);
     const v = sum(f.arcs.h[i]);
@@ -110,11 +148,13 @@ async function regionalScene(key: string, provs: string[], z: Zones): Promise<Sc
 }
 
 /**
- * One place: its partners for the chosen direction. The top ones carry dots with
- * their 24-hour values; further partners (and special days, which only have daily
- * totals) are faint lines. Trips that stay inside are the place's halo.
+ * One place: its partners within Spain for the chosen direction. The top ones
+ * carry dots with their 24-hour values; further partners are faint lines. Special
+ * days only have daily totals in the place file, so their dots come from the
+ * province's file (`regional`), which has hours for the bigger connections.
+ * Trips that stay inside are the place's halo.
  */
-function placeScene(p: Place, zone: number, key: string, way: Way, z: Zones): Scene & { bounds: Bounds } {
+function placeScene(p: Place, zone: number, key: string, way: Way, z: Zones, regional?: Regional): Scene & { bounds: Bounds } {
   const day = p.keys[key];
   const at = (q: number): [number, number] => [z.zones.lon[q], z.zones.lat[q]];
   const here = at(zone);
@@ -122,7 +162,10 @@ function placeScene(p: Place, zone: number, key: string, way: Way, z: Zones): Sc
   const w = way === 'salen' ? day.out : day.in;
   const arcs: FlowArc[] = [];
   const places: Scene['places'] = [{ name: z.zones.name[zone], lon: here[0], lat: here[1], day: Infinity }];
+  const seen = new Set<number>();
   const add = (q: number, hours: number[], dots: boolean) => {
+    if (seen.has(q) || q === zone || isForeign(z, q)) return;
+    seen.add(q);
     arcs.push(way === 'salen' ? { o: here, d: at(q), hours, from: 0, dots } : { o: at(q), d: here, hours, from: 0, dots });
     places.push({ name: z.zones.name[q], lon: at(q)[0], lat: at(q)[1], day: sum(hours) });
   };
@@ -130,10 +173,15 @@ function placeScene(p: Place, zone: number, key: string, way: Way, z: Zones): Sc
     w.z.forEach((q, i) => add(q, w.h[i], true));
     w.sz.forEach((q, i) => add(q, flat(w.sday[i]), false));
   } else {
+    regional?.arcs.o.forEach((o, i) => {
+      const d = regional.arcs.d[i];
+      if (way === 'salen' && o === zone) add(d, regional.arcs.h[i], true);
+      if (way === 'llegan' && d === zone) add(o, regional.arcs.h[i], true);
+    });
     w.z.forEach((q, i) => add(q, flat(w.day[i]), false));
   }
   // Frame the place and its twelve biggest partners.
-  const pts = [here, ...w.z.slice(0, 12).map(at)];
+  const pts = [here, ...w.z.filter((q) => !isForeign(z, q)).slice(0, 12).map(at)];
   const lons = pts.map((p) => p[0]);
   const lats = pts.map((p) => p[1]);
   const bounds: Bounds = [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]];
@@ -176,6 +224,11 @@ export function LivingMap() {
   const place = placeZone !== null && zones && placeData?.id === zones.zones.id[placeZone] ? placeData : null;
 
   useEffect(() => (SHOW_PERF ? startPerfSampler(setPerf) : undefined), []);
+  useEffect(() => {
+    if (!layerRef.current) return;
+    applyLook(layerRef.current, phone);
+    mapRef.current?.triggerRepaint();
+  }, [phone]);
 
   // Map: created once zones are known.
   useEffect(() => {
@@ -192,28 +245,42 @@ export function LivingMap() {
       maxZoom: 11,
       dragRotate: false,
       pitchWithRotate: false,
-      cooperativeGestures: window.matchMedia('(pointer: coarse)').matches,
+      // Scrolling the page never gets trapped by the map: zoom with Ctrl/⌘ + wheel,
+      // the buttons, or two fingers.
+      cooperativeGestures: true,
+      locale: {
+        'CooperativeGesturesHandler.WindowsHelpText': t.map.ctrlZoom,
+        'CooperativeGesturesHandler.MacHelpText': t.map.cmdZoom,
+        'CooperativeGesturesHandler.MobileHelpText': t.map.twoFingers,
+        'NavigationControl.ZoomIn': t.map.zoomIn,
+        'NavigationControl.ZoomOut': t.map.zoomOut,
+      },
       attributionControl: { compact: true },
     });
     map.touchZoomRotate.disableRotation();
+    if (!window.matchMedia('(pointer: coarse)').matches) map.addControl(new NavigationControl({ showCompass: false }), 'top-right');
     // Frame the opening view now and again on load (the container may not have its
     // size yet), unless a place (e.g. from a shared link) is already being framed.
     const frame = () => {
       if (placeZoneRef.current !== null) return;
-      const cam = map.cameraForBounds((zoomedOut ? SPAIN_BOUNDS : MADRID_BOUNDS) as LngLatBoundsLike, { padding: viewPadding() });
+      const cam = zoomedOut ? map.cameraForBounds(SPAIN_BOUNDS, { padding: viewPadding() }) : madridCamera(map);
       if (cam) map.jumpTo(cam);
     };
     frame();
     map.once('load', frame);
     const layer = new FlowLayer('flows', DOT_BUDGET);
+    layer.density = DENSITY;
     layer.getHour = () => clock.hour;
     layer.paused = REDUCED;
-    layer.coreOpacity = CORE;
-    layer.glowGain = GAIN;
+    applyLook(layer, window.matchMedia('(max-width: 767px)').matches);
     layer.onStats = setStats;
     mapRef.current = map;
     layerRef.current = layer;
     map.on('load', () => {
+      // The zoning credit starts folded into its ⓘ so it never sits under the panels.
+      const attrib = map.getContainer().querySelector('.maplibregl-ctrl-attrib');
+      attrib?.classList.remove('maplibregl-compact-show');
+      attrib?.removeAttribute('open');
       map.addLayer(layer);
       const z = placeZoneRef.current;
       if (z !== null) map.setFilter('zone-selected', ['==', ['get', 'id'], zones.zones.id[z]]);
@@ -270,10 +337,17 @@ export function LivingMap() {
     if (!zones || !manifest) return;
     if (place && placeZone !== null) {
       const sig = `${place.id}|${key}|${way}`;
-      if (sig !== placeSig.current) {
-        placeSig.current = sig;
+      if (sig === placeSig.current) return;
+      placeSig.current = sig;
+      if (isFull(place.keys[key].out)) {
         setScene(placeScene(place, placeZone, key, way, zones));
+        return;
       }
+      // Lines first, then dots once the province's file arrives (unless the view moved on).
+      setScene(placeScene(place, placeZone, key, way, zones));
+      loadRegional(zones.zones.prov[placeZone], key)
+        .then((r) => { if (placeSig.current === sig) setScene(placeScene(place, placeZone, key, way, zones, r)); })
+        .catch(() => {});
       return;
     }
     placeSig.current = '';
@@ -313,16 +387,22 @@ export function LivingMap() {
 
   const day = manifest?.keys[key];
   const fly = (to: 'spain' | 'madrid') => {
-    mapRef.current?.fitBounds(to === 'spain' ? SPAIN_BOUNDS : MADRID_BOUNDS, { padding: viewPadding(), duration: REDUCED ? 0 : 1200 });
+    const map = mapRef.current;
+    const cam = map && (to === 'spain' ? map.cameraForBounds(SPAIN_BOUNDS, { padding: viewPadding() }) : madridCamera(map));
+    if (cam) map.flyTo({ ...cam, duration: REDUCED ? 0 : 1200 });
   };
-  const closePlace = () => { setView({ place: null }); fly('spain'); };
+  // Closing a place keeps the camera where it is.
+  const closePlace = () => setView({ place: null });
   const onWay = (w: Way) => setView({ way: w });
   const placeDay = place?.keys[key];
   const special = day?.kind === 'special';
   const shownError = error ?? sceneError;
+  const storyZone = placeZone ?? (zones && placeData ? zones.zones.id.indexOf(placeData.id) : -1);
+  const storyName = zones && storyZone >= 0 ? placeName(zones, storyZone) : null;
+  const showCard = !phone && zones && placeZone !== null && placeDay;
 
   return (
-    <section className="hero" id="mapa" aria-label={t.nav.map}>
+    <section className="hero" id="mapa" aria-label={t.nav.map} data-place={!!showCard}>
       <div ref={container} className="map" aria-label={t.hero.mapLabel} role="region" />
       <div className="labels" aria-hidden="true">
         {labels.map((l) => (
@@ -334,14 +414,11 @@ export function LivingMap() {
         <h1 className="hero-title"><Wordmark layout="inline" className="hero-wordmark" /></h1>
         {day && (
           <p className="hero-note">
-            {day.kind === 'typical'
-              ? (() => { const [a, b, c] = t.hero.typical(day.label[LANG], day.n ?? 0, day.note?.[LANG] ?? ''); return <>{a}<strong>{b}</strong>{c}</>; })()
-              : (() => { const [a, b] = t.hero.special(day.label[LANG], formatDate(day.date!, LANG)); return <><strong>{a}</strong>{b}</>; })()}
-            {' '}{scope.level === 'area' ? t.hero.areas : t.hero.zones}
+            {(() => { const [a, b] = t.hero.day(key, day.label[LANG], day.n ?? 0); return <><strong>{a}</strong>{b}</>; })()}
           </p>
         )}
         {zones && <Search zones={zones} onPick={(z) => setView({ place: z })} />}
-        {!phone && zones && placeZone !== null && placeDay ? (
+        {showCard ? (
           <PlaceCard zones={zones} zone={placeZone} day={placeDay} way={way} onWay={onWay} onClose={closePlace} special={special} />
         ) : placeZone === null && (
           <button className="chip-btn view-btn" onClick={() => fly(zoomedOut ? 'madrid' : 'spain')}>
@@ -351,11 +428,18 @@ export function LivingMap() {
       </header>
 
       {manifest && (
-        <Dock manifest={manifest} dayKey={key} onDay={(d) => setView({ day: d })} stats={stats} level={scope.level} mobile={phone}
+        <Dock manifest={manifest} dayKey={key} onDay={(d) => setView({ day: d })} unit={stats?.unit ?? null} mobile={phone}
+          placeOpen={placeZone !== null}
           placeRow={phone && zones && placeZone !== null
             ? <PlaceRow zones={zones} zone={placeZone} way={way} onWay={onWay} onClose={closePlace} /> : undefined}
           placeDetail={phone && zones && placeZone !== null && placeDay
             ? <PlaceCard compact zones={zones} zone={placeZone} day={placeDay} way={way} onWay={onWay} onClose={closePlace} special={special} /> : undefined} />
+      )}
+
+      {!phone && storyName && (
+        <a className="hero-next" href="#tu-lugar">
+          <span>{t.hero.next(storyName)}</span> <Icon name="chevron" />
+        </a>
       )}
 
       {shownError && <p className="error" role="alert">{t.error(shownError)}</p>}
@@ -363,7 +447,7 @@ export function LivingMap() {
         <pre className="perf" aria-live="off">
           {perf ? `${perf.fps.toFixed(0)} fps · p50 ${perf.p50.toFixed(1)} · p95 ${perf.p95.toFixed(1)} ms\n` : '…\n'}
           {stats ? `${stats.drawn}/${stats.arcs} arcos · ${stats.dots.toLocaleString('es')} puntos · U=${stats.unit}` : ''}
-          {`\npresupuesto ${DOT_BUDGET.toLocaleString('es')} · dpr ${devicePixelRatio} · z ${stats?.layoutZoom.toFixed(1)}`}
+          {`\npresupuesto ${DOT_BUDGET ? DOT_BUDGET.toLocaleString('es') : `${DENSITY}/px²`} · dpr ${devicePixelRatio} · z ${stats?.layoutZoom.toFixed(1)}`}
         </pre>
       )}
     </section>

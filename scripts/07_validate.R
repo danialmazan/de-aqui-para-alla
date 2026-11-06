@@ -2,7 +2,7 @@
 # reports/validation.json and reports/VALIDATION.md, and stops with an error if
 # any check fails (so a bad release never goes unnoticed).
 #
-#   1. Each streamed day against the Ministry's official monthly national totals.
+#   1. Each streamed day (its total, kept by scripts/03_rollup.R) against the Ministry's official monthly national totals.
 #   2. Conservation inside the release: national halos + arcs, place partners + rest.
 #   3. Our normal weekday against the official 2024 day-of-week statistics per zone.
 #   4. Day-type ordering and special-day signatures.
@@ -14,7 +14,7 @@ suppressPackageStartupMessages({
 })
 source("scripts/lib_stream.R")
 
-IN <- "data/interim/days"
+IN <- "data/rollup"
 RAW <- "data/raw"
 release <- fromJSON("public/data/release.json")$release
 REL <- file.path("public/data", release)
@@ -31,8 +31,7 @@ con <- open_duck(threads = 6, memory = "6GB")
 q <- function(sql) as.data.table(dbGetQuery(con, sql))
 
 # --- 1. Streamed days vs official monthly totals -----------------------------------------
-days <- q(sprintf("SELECT regexp_extract(filename, 'day=([0-9]{8})', 1) AS day, sum(trips) AS trips
-                   FROM read_parquet('%s/day=*/od_hour.parquet', filename = true) GROUP BY ALL", IN))
+days <- fread(file.path(IN, "day_totals.csv"), colClasses = c(day = "character"))
 days[, date := as.Date(day, "%Y%m%d")]
 days <- days[as.character(date) %in% unlist(cal$stream)]
 monthly <- rbindlist(lapply(unique(format(days$date, "%Y%m")), function(m) {
@@ -97,11 +96,11 @@ stat <- function(f) {
   x[dia_semana %in% c("MAR", "MIÉ", "JUE"), .(official = mean(promedio)), by = .(zone = cod_zona)]
 }
 lab <- unlist(cal$typical$laborable$days)
-files <- paste(sprintf("'%s/day=%s/od_hour.parquet'", IN, gsub("-", "", lab)), collapse = ",")
-ours <- q(sprintf("SELECT o AS zone, sum(trips) FILTER (WHERE o = d) / %d AS intra,
-                          sum(trips) FILTER (WHERE o <> d) / %d AS inter_out
-                   FROM read_parquet([%s]) GROUP BY o", length(lab), length(lab), files))
-ours_in <- q(sprintf("SELECT d AS zone, sum(trips) / %d AS inter_in FROM read_parquet([%s])
+files <- sprintf("'%s/laborable/od_hour.parquet'", IN)
+ours <- q(sprintf("SELECT o AS zone, CAST(sum(trips) FILTER (WHERE o = d) AS DOUBLE) / %d AS intra,
+                          CAST(sum(trips) FILTER (WHERE o <> d) AS DOUBLE) / %d AS inter_out
+                   FROM read_parquet(%s) GROUP BY o", length(lab), length(lab), files))
+ours_in <- q(sprintf("SELECT d AS zone, CAST(sum(trips) AS DOUBLE) / %d AS inter_in FROM read_parquet(%s)
                       WHERE o <> d GROUP BY d", length(lab), files))
 cmp <- merge(merge(ours, ours_in, by = "zone"), stat("intra")[, .(zone, off_intra = official)], by = "zone")
 cmp <- merge(cmp, stat("inter")[, .(zone, off_inter = official)], by = "zone")

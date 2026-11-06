@@ -170,6 +170,7 @@ const HALO_FS = `#version 300 es
 precision mediump float;
 in vec2 v_uv;
 uniform vec3 u_color;
+uniform float u_gain;
 out vec4 color;
 void main() {
   float d = dot(v_uv, v_uv);
@@ -177,7 +178,7 @@ void main() {
   // Soft fill plus a thin rim, so the halo's size (area ∝ trips) reads.
   float fill = 0.32 * (exp(-d * 2.2) - exp(-2.2)) / (1.0 - exp(-2.2));
   float rim = 0.42 * smoothstep(0.72, 0.9, d) * (1.0 - smoothstep(0.9, 1.0, d));
-  float a = fill + rim;
+  float a = min(0.9, (fill + rim) * u_gain);
   color = vec4(u_color * a, a);
 }`;
 
@@ -198,7 +199,7 @@ function compile(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgr
 }
 
 type Prepared = {
-  merc: Float32Array;      // per arc: ox, oy, dx, dy, cx, cy (mercator 0..1)
+  merc: Float64Array;      // per arc: ox, oy, dx, dy, cx, cy (mercator 0..1, double precision)
   worldLen: Float32Array;  // per arc: Bézier length in mercator units
   maxV: Float32Array;      // per arc: max hourly value
   hours: Float32Array;     // per arc × 24
@@ -217,8 +218,8 @@ export class FlowLayer implements CustomLayerInterface {
   private haloProgram?: WebGLProgram;
   private haloVao?: WebGLVertexArrayObject;
   private haloInst?: WebGLBuffer;
-  private halos: { merc: Float32Array; hours: Float32Array; maxV: Float32Array } = {
-    merc: new Float32Array(0), hours: new Float32Array(0), maxV: new Float32Array(0),
+  private halos: { merc: Float64Array; hours: Float32Array; maxV: Float32Array } = {
+    merc: new Float64Array(0), hours: new Float32Array(0), maxV: new Float32Array(0),
   };
   private haloK = 0;
   private haloBuf = new Float32Array(0);
@@ -249,12 +250,19 @@ export class FlowLayer implements CustomLayerInterface {
   private lastT = performance.now();
 
   getHour: () => number = () => 8;
+  /** Fixed dot budget; when 0, the budget follows the map's size (see `density`). */
   budget: number;
+  /** Dots per CSS px² of map when `budget` is 0: smaller screens get fewer dots. */
+  density = 0.008;
   paused = false;
   /** Opacity of a lone dot's core (0–1); lower lets dense streams glow rather than merge. */
   coreOpacity = 0.35;
   /** How fast summed coverage turns into brightness in the glow composite. */
   glowGain = 1.6;
+  /** Dot radius in CSS px. */
+  dotRadius = 4.2;
+  /** Multiplies the halos' fill and rim. */
+  haloGain = 1;
   onStats?: (s: FlowStats) => void;
 
   constructor(id: string, budget: number) {
@@ -265,7 +273,7 @@ export class FlowLayer implements CustomLayerInterface {
   /** Set connections and halos together (halo indices in `arc.from` refer to `halos`). */
   setFlows(arcs: FlowArc[], halos: FlowHalo[] = []) {
     const m = halos.length;
-    const merc = new Float32Array(m * 2);
+    const merc = new Float64Array(m * 2);
     const hours = new Float32Array(m * 24);
     const maxV = new Float32Array(m);
     halos.forEach((h, i) => {
@@ -288,7 +296,7 @@ export class FlowLayer implements CustomLayerInterface {
     const n = arcs.length;
     if (this.from.length !== n) this.from = new Int32Array(n).fill(-1);
     this.lineOnly = Uint8Array.from(arcs, (a) => (a.dots === false ? 1 : 0));
-    const merc = new Float32Array(n * 6);
+    const merc = new Float64Array(n * 6);
     const worldLen = new Float32Array(n);
     const maxV = new Float32Array(n);
     const hours = new Float32Array(n * 24);
@@ -413,9 +421,10 @@ export class FlowLayer implements CustomLayerInterface {
         haloDay += day;
       }
     }
-    this.unit = chooseUnit(demand, this.budget);
-    // Halo area ∝ trips; the largest possible halo in this scope gets R_MAX px.
     const canvas = this.map!.getCanvas();
+    const budget = this.budget || Math.max(2500, canvas.clientWidth * canvas.clientHeight * this.density);
+    this.unit = chooseUnit(demand, budget);
+    // Halo area ∝ trips; the largest possible halo in this scope gets R_MAX px.
     const rMax = Math.min(48, Math.max(18, 0.055 * Math.min(canvas.clientWidth, canvas.clientHeight)));
     let haloPeak = 1;
     for (let i = 0; i < haloHours.length; i++) haloPeak = Math.max(haloPeak, haloHours[i]);
@@ -453,9 +462,8 @@ export class FlowLayer implements CustomLayerInterface {
 
     this.arcRows = new Float32Array(Math.max(1, n) * 4 * 3);
     for (let i = 0; i < n; i++) {
-      const m = data.merc.subarray(i * 6, i * 6 + 6);
-      this.arcRows.set([m[0], m[1], m[2], m[3]], i * 4);
-      this.arcRows.set([m[4], m[5], this.lengthPx[i], this.slots[i]], (n + i) * 4);
+      this.arcRows[(n + i) * 4 + 2] = this.lengthPx[i];
+      this.arcRows[(n + i) * 4 + 3] = this.slots[i];
     }
     this.layoutZoom = zoom;
     this.onStats?.({ arcs: n, drawn: drawnArcs, dots: total, unit: this.unit, layoutZoom: zoom, drawnDay, haloDay });
@@ -469,11 +477,27 @@ export class FlowLayer implements CustomLayerInterface {
     const dt = Math.min(0.1, (now - this.lastT) / 1000);
     this.lastT = now;
 
-    // Per-frame row 2: visible dots, phase, underlay width and opacity.
+    // Positions are sent relative to the map centre (computed in double
+    // precision here), so dots stay on their curves at high zoom on GPUs whose
+    // float maths would otherwise snap them to a coarse grid.
+    const ref = MercatorCoordinate.fromLngLat(this.map!.getCenter());
+    const rx = ref.x;
+    const ry = ref.y;
+    const merc = this.data.merc;
+    // Per-frame rows: endpoints and control point (rows 0–1), then visible dots,
+    // phase, underlay width and opacity (row 2).
     const hour = this.getHour();
+    const row1 = n * 4;
     const row2 = 2 * n * 4;
     this.fold.fill(0);
     for (let i = 0; i < n; i++) {
+      const m = i * 6;
+      this.arcRows[i * 4] = merc[m] - rx;
+      this.arcRows[i * 4 + 1] = merc[m + 1] - ry;
+      this.arcRows[i * 4 + 2] = merc[m + 2] - rx;
+      this.arcRows[i * 4 + 3] = merc[m + 3] - ry;
+      this.arcRows[row1 + i * 4] = merc[m + 4] - rx;
+      this.arcRows[row1 + i * 4 + 1] = merc[m + 5] - ry;
       const v = valueAt(this.data.hours.subarray(i * 24, i * 24 + 24), hour);
       if (!this.drawn[i] && this.from[i] >= 0) this.fold[this.from[i]] += v;
       if (!this.paused) this.phase[i] = (this.phase[i] + (dt * SPEED_PX_S) / this.lengthPx[i]) % 1;
@@ -488,7 +512,10 @@ export class FlowLayer implements CustomLayerInterface {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-    const matrix = options.defaultProjectionData.mainMatrix as unknown as Float32List;
+    // The projection matrix, shifted so that the map centre is the origin.
+    const M = options.defaultProjectionData.mainMatrix as unknown as ArrayLike<number>;
+    const matrix = Float32Array.from(M);
+    for (let r = 0; r < 4; r++) matrix[12 + r] = M[r] * rx + M[4 + r] * ry + M[12 + r];
     const viewport: [number, number] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
     const dpr = window.devicePixelRatio || 1;
     gl.enable(gl.BLEND);
@@ -520,7 +547,7 @@ export class FlowLayer implements CustomLayerInterface {
     gl.bindTexture(gl.TEXTURE_2D, this.arcTex!);
     gl.uniformMatrix4fv(gl.getUniformLocation(this.dotProgram, 'u_matrix'), false, matrix);
     gl.uniform2f(gl.getUniformLocation(this.dotProgram, 'u_viewport'), viewport[0] / dpr, viewport[1] / dpr);
-    gl.uniform1f(gl.getUniformLocation(this.dotProgram, 'u_radius'), 4.2);
+    gl.uniform1f(gl.getUniformLocation(this.dotProgram, 'u_radius'), this.dotRadius);
     gl.uniform1f(gl.getUniformLocation(this.dotProgram, 'u_core'), this.coreOpacity);
     gl.uniform1f(gl.getUniformLocation(this.dotProgram, 'u_out'), 1 / this.accumScale);
     gl.uniform3fv(gl.getUniformLocation(this.dotProgram, 'u_from'), AMBER);
@@ -547,8 +574,8 @@ export class FlowLayer implements CustomLayerInterface {
       const breath = this.paused ? 1 : 1 + 0.035 * Math.sin((now / 1000) * (2 * Math.PI / BREATH_S));
       for (let i = 0; i < m; i++) {
         const v = valueAt(this.halos.hours.subarray(i * 24, i * 24 + 24), hour) + this.fold[i];
-        this.haloBuf[i * 3] = this.halos.merc[i * 2];
-        this.haloBuf[i * 3 + 1] = this.halos.merc[i * 2 + 1];
+        this.haloBuf[i * 3] = this.halos.merc[i * 2] - rx;
+        this.haloBuf[i * 3 + 1] = this.halos.merc[i * 2 + 1] - ry;
         this.haloBuf[i * 3 + 2] = this.haloK * Math.sqrt(v) * breath;
       }
       gl.useProgram(this.haloProgram!);
@@ -556,6 +583,7 @@ export class FlowLayer implements CustomLayerInterface {
       gl.uniformMatrix4fv(gl.getUniformLocation(this.haloProgram!, 'u_matrix'), false, matrix);
       gl.uniform2f(gl.getUniformLocation(this.haloProgram!, 'u_viewport'), viewport[0] / dpr, viewport[1] / dpr);
       gl.uniform3fv(gl.getUniformLocation(this.haloProgram!, 'u_color'), LAVENDER);
+      gl.uniform1f(gl.getUniformLocation(this.haloProgram!, 'u_gain'), this.haloGain);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.haloInst!);
       gl.bufferData(gl.ARRAY_BUFFER, this.haloBuf, gl.DYNAMIC_DRAW);
       gl.bindVertexArray(this.haloVao!);
