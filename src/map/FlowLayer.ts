@@ -29,12 +29,22 @@ const AMBER = [1.0, 0.71, 0.28];
 const AQUA = [0.31, 0.88, 0.82];
 const LAVENDER = [0.78, 0.65, 1.0];
 const BREATH_S = 4;
+/**
+ * Per-arc data lives in a float texture wrapped ARC_TEX_W texels wide: three
+ * bands (rows 0, 1, 2 of every arc), each ceil(n / ARC_TEX_W) rows tall. One
+ * texel per arc in a single row would overflow MAX_TEXTURE_SIZE (4096 or 8192 on
+ * many phones) once a scene has thousands of arcs, and the upload would fail.
+ */
+const ARC_TEX_W = 1024;
 
 const DOT_VS = `#version 300 es
 precision highp float;
+precision highp int;
+const int ARC_TEX_W = ${ARC_TEX_W};
 layout(location = 0) in vec2 a_corner;
 layout(location = 1) in vec3 a_inst; // arc index, slot k, stratified rank
 uniform sampler2D u_arcs;
+uniform int u_band; // texture rows per band of arc data
 uniform mat4 u_matrix;
 uniform vec2 u_viewport;
 uniform float u_radius;
@@ -43,9 +53,10 @@ out float v_alpha;
 out float v_t;
 void main() {
   int i = int(a_inst.x);
-  vec4 r0 = texelFetch(u_arcs, ivec2(i, 0), 0);
-  vec4 r1 = texelFetch(u_arcs, ivec2(i, 1), 0);
-  vec4 r2 = texelFetch(u_arcs, ivec2(i, 2), 0);
+  ivec2 at = ivec2(i % ARC_TEX_W, i / ARC_TEX_W);
+  vec4 r0 = texelFetch(u_arcs, at, 0);
+  vec4 r1 = texelFetch(u_arcs, at + ivec2(0, u_band), 0);
+  vec4 r2 = texelFetch(u_arcs, at + ivec2(0, 2 * u_band), 0);
   float slots = r1.w;
   float s = fract((a_inst.y + 0.5) / slots + r2.y);
   float u = 1.0 - s;
@@ -111,9 +122,12 @@ void main() {
 
 const LINE_VS = `#version 300 es
 precision highp float;
+precision highp int;
+const int ARC_TEX_W = ${ARC_TEX_W};
 layout(location = 0) in vec2 a_corner; // x: along segment (0/1), y: side (-1/1)
 layout(location = 1) in vec2 a_inst;   // arc index, segment index
 uniform sampler2D u_arcs;
+uniform int u_band; // texture rows per band of arc data
 uniform mat4 u_matrix;
 uniform vec2 u_viewport;
 uniform float u_segments;
@@ -122,9 +136,10 @@ out float v_side;
 vec2 bez(vec2 a, vec2 c, vec2 b, float t) { float u = 1.0 - t; return u*u*a + 2.0*u*t*c + t*t*b; }
 void main() {
   int i = int(a_inst.x);
-  vec4 r0 = texelFetch(u_arcs, ivec2(i, 0), 0);
-  vec4 r1 = texelFetch(u_arcs, ivec2(i, 1), 0);
-  vec4 r2 = texelFetch(u_arcs, ivec2(i, 2), 0);
+  ivec2 at = ivec2(i % ARC_TEX_W, i / ARC_TEX_W);
+  vec4 r0 = texelFetch(u_arcs, at, 0);
+  vec4 r1 = texelFetch(u_arcs, at + ivec2(0, u_band), 0);
+  vec4 r2 = texelFetch(u_arcs, at + ivec2(0, 2 * u_band), 0);
   float t0 = a_inst.y / u_segments;
   float t1 = (a_inst.y + 1.0) / u_segments;
   vec4 c0 = u_matrix * vec4(bez(r0.xy, r1.xy, r0.zw, t0), 0.0, 1.0);
@@ -240,7 +255,8 @@ export class FlowLayer implements CustomLayerInterface {
   private lineCount = 0;
 
   private data?: Prepared;
-  private arcRows = new Float32Array(0); // 3 rows × arcs × RGBA
+  private arcRows = new Float32Array(0); // 3 bands × band × ARC_TEX_W × RGBA
+  private band = 1; // texture rows per band
   private lengthPx = new Float32Array(0);
   private slots = new Float32Array(0);
   private phase = new Float64Array(0);
@@ -460,10 +476,12 @@ export class FlowLayer implements CustomLayerInterface {
     gl.bufferData(gl.ARRAY_BUFFER, lines, gl.STATIC_DRAW);
     this.lineCount = drawnArcs * UNDERLAY_SEGMENTS;
 
-    this.arcRows = new Float32Array(Math.max(1, n) * 4 * 3);
+    this.band = Math.max(1, Math.ceil(n / ARC_TEX_W));
+    this.arcRows = new Float32Array(ARC_TEX_W * this.band * 3 * 4);
+    const row1 = this.band * ARC_TEX_W * 4;
     for (let i = 0; i < n; i++) {
-      this.arcRows[(n + i) * 4 + 2] = this.lengthPx[i];
-      this.arcRows[(n + i) * 4 + 3] = this.slots[i];
+      this.arcRows[row1 + i * 4 + 2] = this.lengthPx[i];
+      this.arcRows[row1 + i * 4 + 3] = this.slots[i];
     }
     this.layoutZoom = zoom;
     this.onStats?.({ arcs: n, drawn: drawnArcs, dots: total, unit: this.unit, layoutZoom: zoom, drawnDay, haloDay });
@@ -484,11 +502,12 @@ export class FlowLayer implements CustomLayerInterface {
     const rx = ref.x;
     const ry = ref.y;
     const merc = this.data.merc;
-    // Per-frame rows: endpoints and control point (rows 0–1), then visible dots,
-    // phase, underlay width and opacity (row 2).
+    // Per-frame bands: endpoints and control point (bands 0–1), then visible dots,
+    // phase, underlay width and opacity (band 2). Within a band, arc i sits at
+    // texel i (row-major, ARC_TEX_W wide), so offsets are band start + i × 4.
     const hour = this.getHour();
-    const row1 = n * 4;
-    const row2 = 2 * n * 4;
+    const row1 = this.band * ARC_TEX_W * 4;
+    const row2 = 2 * row1;
     this.fold.fill(0);
     for (let i = 0; i < n; i++) {
       const m = i * 6;
@@ -508,7 +527,7 @@ export class FlowLayer implements CustomLayerInterface {
       this.arcRows[row2 + i * 4 + 3] = v > 0 ? 0.03 + 0.3 * rel : 0;
     }
     gl.bindTexture(gl.TEXTURE_2D, this.arcTex!);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, Math.max(1, n), 3, 0, gl.RGBA, gl.FLOAT, this.arcRows);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, ARC_TEX_W, this.band * 3, 0, gl.RGBA, gl.FLOAT, this.arcRows);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
@@ -529,6 +548,7 @@ export class FlowLayer implements CustomLayerInterface {
     gl.uniform2f(gl.getUniformLocation(this.lineProgram, 'u_viewport'), viewport[0] / dpr, viewport[1] / dpr);
     gl.uniform1f(gl.getUniformLocation(this.lineProgram, 'u_segments'), UNDERLAY_SEGMENTS);
     gl.uniform1i(gl.getUniformLocation(this.lineProgram, 'u_arcs'), 0);
+    gl.uniform1i(gl.getUniformLocation(this.lineProgram, 'u_band'), this.band);
     gl.bindVertexArray(this.lineVao!);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.lineCount);
 
@@ -553,6 +573,7 @@ export class FlowLayer implements CustomLayerInterface {
     gl.uniform3fv(gl.getUniformLocation(this.dotProgram, 'u_from'), AMBER);
     gl.uniform3fv(gl.getUniformLocation(this.dotProgram, 'u_to'), AQUA);
     gl.uniform1i(gl.getUniformLocation(this.dotProgram, 'u_arcs'), 0);
+    gl.uniform1i(gl.getUniformLocation(this.dotProgram, 'u_band'), this.band);
     gl.bindVertexArray(this.dotVao!);
     gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, this.dotCount);
     gl.bindVertexArray(null);
